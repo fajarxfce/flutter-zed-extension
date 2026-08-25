@@ -71,7 +71,7 @@ The DAP names align with Zed's `.zed/debug.json` contract: `label` and `adapter`
 
 | Capability | Owner | Status and boundary |
 | --- | --- | --- |
-| Dart language-server registration | Native Zed extension manifest | Available in `extension.toml`; no runtime command provider is declared. |
+| Dart language navigation | Zed's official Dart extension | Required for Dart Analysis Server navigation; this extension does not register a language server. |
 | Flutter project validation and SDK selection | Future offline consumer | Contracted by this schema; no project detection or Flutter/FVM executable lookup occurs here. |
 | Flutter tasks | `scripts/task_templates.py` → future `.zed/tasks.json` | The generator emits declarative `label`, `command`, `args`, and deterministic `cwd` task objects. It uses the resolved Flutter/Dart executable paths and never shell-concatenates values. Environment, terminal behavior, and save options remain Zed task fields for a future project-setup writer; this task deliberately does not write a consumer `.zed/tasks.json`. |
 | Flutter debugging | `scripts/dap_templates.py` → consumer `.zed/debug.json` | Generates declarative Dart-adapter Flutter launch/attach entries; no adapter is declared or real DAP process executed. |

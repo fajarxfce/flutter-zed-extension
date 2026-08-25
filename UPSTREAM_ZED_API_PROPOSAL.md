@@ -17,7 +17,7 @@ The intent is not VS Code compatibility or a general terminal automation API. It
 
 Zed's current official extension documentation lists language, debugger, theme, icon theme, snippet, and MCP-server features; it does not document extension-contributed command-palette commands/keybindings, terminal stdin/control, lifecycle hooks, or a device/status UI. This is a documentation-surface observation, not a claim that an internal API cannot exist. Zed does document capability-gated `process:exec`, in which a denied operation returns an error.
 
-This product currently registers Dart LSP/snippets and generates project-local `.zed/tasks.json`/`.zed/debug.json`; it does **not** provide native command-palette commands, a device picker, a custom panel, save hooks, terminal stdin control, or generic VS Code debug parity. Its optional tmux bridge is external, explicitly targeted, and deliberately limited to a proven owned runner plus literal `r`/`R` hot actions. Full source and reproducible-test traceability is recorded in `.sisyphus/evidence/task-21-traceability.txt`.
+This product currently supplies Flutter snippets and generates project-local `.zed/tasks.json`/`.zed/debug.json`; Zed's official Dart extension supplies Dart Analysis Server navigation and the Dart debug adapter. This product does **not** provide native command-palette commands, a device picker, a custom panel, save hooks, terminal stdin control, or generic VS Code debug parity. Its optional tmux bridge is external, explicitly targeted, and deliberately limited to a proven owned runner plus literal `r`/`R` hot actions. Full source and reproducible-test traceability is recorded in `.sisyphus/evidence/task-21-traceability.txt`.
 
 ## Use cases
 
@@ -141,7 +141,7 @@ Permission prompts must state the extension ID, workspace, executable, argv patt
 
 ## Migration path for this Flutter workflow
 
-1. Preserve the current safe default: manifest LSP/snippets plus project-local tasks/debug configuration.
+1. Preserve the current safe default: Flutter snippets plus project-local tasks/debug configuration, alongside Zed's official Dart extension for language navigation and debugging.
 2. If command registration is available, map existing generated task intents to extension commands; retain `.zed/tasks.json` as the fallback.
 3. If scoped process handles and `stdin:write` are granted, start Flutter through the owned-handle API and expose only fixed reload/restart tokens. Do not import tmux identity, PID, or pane semantics.
 4. If lifecycle/status APIs are available and enabled, refresh an extension-owned device status item. Never auto-run Flutter from a save hook without `automation:process`.

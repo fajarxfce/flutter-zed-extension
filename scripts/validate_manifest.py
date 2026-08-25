@@ -51,28 +51,14 @@ def validate(manifest_path: Path) -> None:
         if path.is_absolute() or ".." in path.parts or path.suffix != ".json":
             fail(f"invalid snippet path: {snippet_path}")
 
-    language_servers = manifest.get("language_servers", {})
-    if not isinstance(language_servers, dict):
-        fail("language_servers must be a table")
-    for server_id, server in language_servers.items():
-        if not isinstance(server, dict):
-            fail(f"language_servers.{server_id} must be a table")
-        if not isinstance(server.get("name"), str) or not server["name"].strip():
-            fail(f"language_servers.{server_id}.name must be a non-empty string")
-        if not isinstance(server.get("language"), str) or not server["language"].strip():
-            fail(f"language_servers.{server_id}.language must be a non-empty string")
-        languages = server.get("languages")
-        if not isinstance(languages, list) or not languages or not all(isinstance(language, str) and language.strip() for language in languages):
-            fail(f"language_servers.{server_id}.languages must be a non-empty string list")
-
-    forbidden = {"commands", "panels", "terminal", "tmux", "fvm"}
+    forbidden = {"commands", "debug_adapters", "language_servers", "lib", "panels", "terminal", "tmux", "fvm"}
     present = forbidden.intersection(manifest)
     if present:
         fail(f"unsupported manifest declarations: {', '.join(sorted(present))}")
 
     print(f"manifest valid: {manifest_path}")
-    print("capabilities: Dart language-server registration and Flutter snippet metadata")
-    print("debug integration: no adapter declared until a supported runtime implementation is added")
+    print("capabilities: Flutter snippet metadata")
+    print("Dart language navigation and debugging require Zed's official Dart extension")
 
 
 def main() -> None:
