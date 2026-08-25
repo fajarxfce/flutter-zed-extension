@@ -77,6 +77,26 @@ class ProjectDetectionTests(unittest.TestCase):
         self.assertEqual(parsed["publish_to"], "none")
         self.assertEqual(parsed["description"], "Preserve # inside quotes")
 
+    def test_sibling_dependency_sdk_metadata_does_not_duplicate_flutter_sdk(self) -> None:
+        pubspec = """\
+name: app
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+flutter:
+"""
+        parsed = parse_pubspec(pubspec)
+        self.assertEqual(parsed["dependencies"], {"flutter": {"sdk": "flutter"}})
+        with tempfile.TemporaryDirectory(dir=ROOT) as temporary_directory:
+            project = Path(temporary_directory)
+            (project / "pubspec.yaml").write_text(pubspec, encoding="utf-8")
+            detected = detect_project(project)
+        self.assertEqual(detected.kind, "flutter_app")
+
     def test_nested_font_structures_and_unrelated_values_are_ignored(self) -> None:
         pubspec = """\
 name: app

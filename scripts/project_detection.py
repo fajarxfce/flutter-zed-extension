@@ -129,6 +129,8 @@ def parse_pubspec(contents: str) -> dict[str, YamlValue]:
                 root[key] = _scalar(value, line_number)
             continue
 
+        if active_mapping is not None and active_mapping[0] == "flutter_dependency" and indent <= active_mapping[1]:
+            active_mapping = None
         if active_mapping is None or indent <= active_mapping[1] or ":" not in text:
             continue
         parent, parent_indent = active_mapping
