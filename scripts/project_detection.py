@@ -70,10 +70,15 @@ def _scalar(value: str, line_number: int) -> str:
 
 
 def parse_pubspec(contents: str) -> dict[str, YamlValue]:
-    """Parse the small indentation-based YAML subset material to pubspec checks."""
+    """Extract only the pubspec metadata used for project classification.
+
+    Pubspecs permit arbitrary package and Flutter configuration.  This scanner
+    validates the small set of structural paths the detector consumes while
+    deliberately skipping unrelated subtrees.
+    """
     root: dict[str, YamlValue] = {}
-    stack: list[tuple[int, dict[str, YamlValue]]] = [(-1, root)]
-    pending: tuple[int, dict[str, YamlValue], str] | None = None
+    active_mapping: tuple[str, int] | None = None
+    workspace_indent: int | None = None
 
     for line_number, raw_line in enumerate(contents.splitlines(), start=1):
         if not raw_line.strip() or raw_line.lstrip().startswith("#"):
@@ -82,40 +87,76 @@ def parse_pubspec(contents: str) -> dict[str, YamlValue]:
             raise PubspecError(f"line {line_number}: tabs are unsupported")
         indent = len(raw_line) - len(raw_line.lstrip(" "))
         text = raw_line[indent:]
-        while len(stack) > 1 and indent <= stack[-1][0]:
-            stack.pop()
-        if text.startswith("- "):
-            if pending is None or indent <= pending[0]:
-                raise PubspecError(f"line {line_number}: list has no mapping key")
-            parent_indent, parent, key = pending
-            if indent <= parent_indent:
-                raise PubspecError(f"line {line_number}: invalid list indentation")
-            existing = parent.get(key)
-            if existing is None or existing == {}:
-                existing = []
-                parent[key] = existing
-            if not isinstance(existing, list):
-                raise PubspecError(f"line {line_number}: mixed mapping and list values")
-            existing.append(_scalar(_strip_inline_comment(text[2:]).strip(), line_number))
-            stack = [(stack_indent, mapping) for stack_indent, mapping in stack if stack_indent < indent]
+
+        if workspace_indent is not None and indent > workspace_indent and text.startswith("- "):
+            workspace = root["workspace"]
+            if not isinstance(workspace, list):
+                raise PubspecError(f"line {line_number}: workspace must be a list")
+            workspace.append(_scalar(_strip_inline_comment(text[2:]).strip(), line_number))
             continue
-        if ":" not in text:
-            raise PubspecError(f"line {line_number}: expected key: value")
+        if indent == 0:
+            active_mapping = None
+            workspace_indent = None
+            if ":" not in text:
+                continue
+            key, value = text.split(":", maxsplit=1)
+            key = key.strip()
+            value = _strip_inline_comment(value).strip()
+            if key not in {"name", "environment", "dependencies", "flutter", "workspace"}:
+                if value:
+                    try:
+                        root[key] = _scalar(value, line_number)
+                    except PubspecError:
+                        pass
+                continue
+            if key in root:
+                raise PubspecError(f"line {line_number}: duplicate key {key!r}")
+            if key == "flutter":
+                if value:
+                    _scalar(value, line_number)
+                root[key] = {}
+            elif key == "workspace":
+                if value:
+                    raise PubspecError(f"line {line_number}: workspace must be a list")
+                root[key] = []
+                workspace_indent = indent
+            elif key in {"environment", "dependencies"}:
+                if value:
+                    raise PubspecError(f"line {line_number}: {key} must be a mapping")
+                root[key] = {}
+                active_mapping = (key, indent)
+            else:
+                root[key] = _scalar(value, line_number)
+            continue
+
+        if active_mapping is None or indent <= active_mapping[1] or ":" not in text:
+            continue
+        parent, parent_indent = active_mapping
+        if indent <= parent_indent:
+            continue
         key, value = text.split(":", maxsplit=1)
         key = key.strip()
-        if not key or key.startswith(("-", "?", "&", "*")):
-            raise PubspecError(f"line {line_number}: unsupported YAML key")
         value = _strip_inline_comment(value).strip()
-        parent = stack[-1][1]
-        if key in parent:
-            raise PubspecError(f"line {line_number}: duplicate key {key!r}")
-        pending = (indent, parent, key)
-        if value:
-            parent[key] = _scalar(value, line_number)
-            continue
-        mapping: dict[str, YamlValue] = {}
-        parent[key] = mapping
-        stack.append((indent, mapping))
+        mapping = (
+            _mapping(_mapping(root["dependencies"]).get("flutter"))
+            if parent == "flutter_dependency"
+            else _mapping(root[parent])
+        )
+        if mapping is None:
+            raise PubspecError(f"line {line_number}: {parent} must be a mapping")
+        if parent == "environment" and key == "sdk":
+            if key in mapping:
+                raise PubspecError(f"line {line_number}: duplicate key {key!r}")
+            mapping[key] = _scalar(value, line_number)
+        elif parent == "dependencies" and key == "flutter":
+            if key in mapping or value:
+                raise PubspecError(f"line {line_number}: flutter dependency must be a mapping")
+            mapping[key] = {}
+            active_mapping = ("flutter_dependency", indent)
+        elif parent == "flutter_dependency" and key == "sdk":
+            if key in mapping:
+                raise PubspecError(f"line {line_number}: duplicate key {key!r}")
+            mapping[key] = _scalar(value, line_number)
 
     if not root:
         raise PubspecError("pubspec is empty")

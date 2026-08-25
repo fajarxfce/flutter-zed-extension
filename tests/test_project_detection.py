@@ -77,6 +77,33 @@ class ProjectDetectionTests(unittest.TestCase):
         self.assertEqual(parsed["publish_to"], "none")
         self.assertEqual(parsed["description"], "Preserve # inside quotes")
 
+    def test_nested_font_structures_and_unrelated_values_are_ignored(self) -> None:
+        pubspec = """\
+name: app
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+custom_package_configuration:
+  unsupported: [inline, collection]
+flutter:
+  assets:
+    - assets/images/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+"""
+        parsed = parse_pubspec(pubspec)
+        self.assertEqual(parsed["name"], "app")
+        self.assertEqual(parsed["environment"], {"sdk": ">=3.0.0 <4.0.0"})
+        self.assertEqual(parsed["dependencies"], {"flutter": {"sdk": "flutter"}})
+        self.assertEqual(parsed["flutter"], {})
+
     def test_nested_pubspec_wins_over_ancestor_workspace(self) -> None:
         with tempfile.TemporaryDirectory(dir=ROOT) as temporary_directory:
             workspace = Path(temporary_directory)
