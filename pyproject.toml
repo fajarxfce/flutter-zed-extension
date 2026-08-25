@@ -1,0 +1,12 @@
+[build-system]
+requires = []
+build-backend = "setuptools.build_meta:__legacy__"
+
+[project]
+name = "flutter-zed-extension-tooling"
+version = "0.1.0"
+description = "Offline validation tooling for the Flutter Zed extension manifest"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

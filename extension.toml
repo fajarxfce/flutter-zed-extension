@@ -1,0 +1,13 @@
+id = "flutter"
+name = "Flutter"
+description = "Dart and Flutter integration foundations for Zed."
+version = "0.1.0"
+schema_version = 1
+authors = ["Flutter Zed Extension Contributors"]
+repository = "https://github.com/example/flutter-zed-extension"
+snippets = ["./snippets/flutter.json"]
+
+[language_servers.dart]
+name = "Dart Language Server"
+language = "Dart"
+languages = ["Dart"]
