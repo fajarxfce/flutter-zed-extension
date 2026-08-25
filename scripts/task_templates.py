@@ -19,24 +19,24 @@ from scripts.configuration import FlutterConfiguration
 from scripts.runtime import safe_environment
 from scripts.sdk_resolution import ResolvedSdk
 
+ZED_WORKTREE_ROOT = "$ZED_WORKTREE_ROOT"
+
 
 @dataclass(frozen=True)
 class TaskTemplate:
-    """One declarative Zed task with an executable and separate argv entries."""
-
     label: str
     intent: str
-    command: Path
+    command: str
     args: tuple[str, ...]
     cwd: Path
+    executable: Path
 
     def as_json(self) -> dict[str, object]:
-        """Return the stable Zed task object without shell interpolation."""
         return {
             "label": self.label,
-            "command": str(self.command),
+            "command": self.command,
             "args": list(self.args),
-            "cwd": str(self.cwd),
+            "cwd": ZED_WORKTREE_ROOT,
         }
 
 
@@ -58,10 +58,17 @@ def _mode_args(configuration: FlutterConfiguration) -> tuple[str, ...]:
     return (f"--{configuration.mode}",)
 
 
-def _target_args(configuration: FlutterConfiguration) -> tuple[str, ...]:
+def _relative_to_project(path: Path, project_root: Path) -> str:
+    try:
+        return path.resolve().relative_to(project_root.resolve()).as_posix()
+    except ValueError as error:
+        raise ValueError(f"Target must be inside project root: {path}") from error
+
+
+def _target_args(configuration: FlutterConfiguration, project_root: Path) -> tuple[str, ...]:
     if configuration.target is None:
         return ()
-    return ("--target", str(configuration.target))
+    return ("--target", _relative_to_project(configuration.target, project_root))
 
 
 def _flavor_args(configuration: FlutterConfiguration) -> tuple[str, ...]:
@@ -86,45 +93,53 @@ def generate_task_templates(configuration: FlutterConfiguration, sdk: ResolvedSd
     """
     root = configuration.project_root.resolve()
     flutter = sdk.flutter.path.resolve()
-    dart = sdk.dart.path.resolve()
-    target = _target_args(configuration)
+    target = _target_args(configuration, root)
+    format_target = _relative_to_project(configuration.target, root) if configuration.target is not None else "."
     flavor = _flavor_args(configuration)
     mode = _mode_args(configuration)
     user_args = configuration.args
+    command = "fvm" if configuration.sdk_mode == "fvm" else "flutter"
+    flutter_prefix = ("flutter",) if configuration.sdk_mode == "fvm" else ()
+    dart_command = "fvm" if configuration.sdk_mode == "fvm" else "dart"
+    dart_prefix = ("dart",) if configuration.sdk_mode == "fvm" else ()
     templates = (
-        TaskTemplate("Flutter: Pub get", "Resolve pub dependencies", flutter, ("pub", "get"), root),
-        TaskTemplate("Flutter: Analyze", "Analyze the project", flutter, ("analyze", *user_args), root),
+        TaskTemplate("Flutter: Pub get", "Resolve pub dependencies", command, (*flutter_prefix, "pub", "get"), root, flutter),
+        TaskTemplate("Flutter: Analyze", "Analyze the project", command, (*flutter_prefix, "analyze", *user_args), root, flutter),
         TaskTemplate(
             "Flutter: Format (check)",
             "Check Dart formatting without modifying files",
-            dart,
-            ("format", "--set-exit-if-changed", str(configuration.target or root)),
+            dart_command,
+            (*dart_prefix, "format", "--set-exit-if-changed", format_target),
             root,
+            sdk.dart.path.resolve(),
         ),
-        TaskTemplate("Flutter: Test", "Run Flutter tests", flutter, ("test", *user_args), root),
+        TaskTemplate("Flutter: Test", "Run Flutter tests", command, (*flutter_prefix, "test", *user_args), root, flutter),
         TaskTemplate(
             "Flutter: Build APK",
             "Build an Android APK",
-            flutter,
-            ("build", "apk", *target, *flavor, *mode, *user_args),
+            command,
+            (*flutter_prefix, "build", "apk", *target, *flavor, *mode, *user_args),
             root,
+            flutter,
         ),
         TaskTemplate(
             "Flutter: Build web",
             "Build a web release",
-            flutter,
-            ("build", "web", *target, *mode, *user_args),
+            command,
+            (*flutter_prefix, "build", "web", *target, *mode, *user_args),
             root,
+            flutter,
         ),
         TaskTemplate(
             "Flutter: Run",
             "Run the Flutter application",
-            flutter,
-            ("run", *target, *flavor, *mode, *_device_args(configuration), *user_args),
+            command,
+            (*flutter_prefix, "run", *target, *flavor, *mode, *_device_args(configuration), *user_args),
             root,
+            flutter,
         ),
-        TaskTemplate("Flutter: Devices", "List available Flutter devices", flutter, ("devices",), root),
-        TaskTemplate("Flutter: Clean", "Remove Flutter build artifacts", flutter, ("clean",), root),
+        TaskTemplate("Flutter: Devices", "List available Flutter devices", command, (*flutter_prefix, "devices"), root, flutter),
+        TaskTemplate("Flutter: Clean", "Remove Flutter build artifacts", command, (*flutter_prefix, "clean"), root, flutter),
     )
     return TaskTemplates(templates)
 
@@ -135,8 +150,9 @@ def execute_task_template(
     environment: Mapping[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run an already-generated template without a shell or output translation."""
+    arguments = task.args[1:] if task.command == "fvm" else task.args
     return subprocess.run(
-        (str(task.command), *task.args),
+        (str(task.executable), *arguments),
         check=False,
         capture_output=True,
         cwd=task.cwd,

@@ -75,7 +75,10 @@ class DebugConfigurationTests(unittest.TestCase):
         self.assertIsNone(attach.flutter_mode)
         self.assertIsNone(attach.device_id)
         self.assertEqual(attach.vm_service_uri, "http://127.0.0.1:8181/abc/")
-        self.assertEqual(json.loads(generate_debug_configurations(self.configuration, self.sdk).to_json())[0]["program"], str(self.target.resolve()))
+        generated = json.loads(generate_debug_configurations(self.configuration, self.sdk).to_json())[0]
+        self.assertEqual(generated["program"], "lib/main_staging.dart")
+        self.assertEqual(generated["cwd"], "$ZED_WORKTREE_ROOT")
+        self.assertNotIn(str(self.root), json.dumps(generated))
 
     def test_fake_adapter_receives_exact_launch_json_without_tmux(self) -> None:
         launch = generate_debug_configurations(self.configuration, self.sdk).configurations[0]
@@ -87,11 +90,11 @@ class DebugConfigurationTests(unittest.TestCase):
             json.loads(log_path.read_text(encoding="utf-8")),
             {
                 "adapter": "Dart",
-                "cwd": str(self.root.resolve()),
+                "cwd": "$ZED_WORKTREE_ROOT",
                 "deviceId": "emulator-5554",
                 "flutterMode": "profile",
                 "label": "Flutter: Launch",
-                "program": str(self.target.resolve()),
+                "program": "lib/main_staging.dart",
                 "request": "launch",
                 "toolArgs": ["--flavor", "staging", "--dart-define=API_ENV=staging", "--trace-startup"],
                 "type": "flutter",

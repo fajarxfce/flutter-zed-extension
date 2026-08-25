@@ -19,6 +19,7 @@ from scripts.configuration import FlutterConfiguration
 from scripts.diagnostics import Diagnostic, dap_failure
 from scripts.runtime import safe_environment
 from scripts.sdk_resolution import ResolvedSdk
+from scripts.task_templates import ZED_WORKTREE_ROOT
 
 DART_ADAPTER = "Dart"
 FLUTTER_TYPE = "flutter"
@@ -32,8 +33,8 @@ class DebugConfiguration:
     adapter: str
     request: str
     type: str
-    program: Path
-    cwd: Path
+    program: str
+    cwd: str
     flutter_mode: str | None = None
     device_id: str | None = None
     tool_args: tuple[str, ...] = ()
@@ -47,8 +48,8 @@ class DebugConfiguration:
             "adapter": self.adapter,
             "request": self.request,
             "type": self.type,
-            "program": str(self.program),
-            "cwd": str(self.cwd),
+            "program": self.program,
+            "cwd": self.cwd,
         }
         if self.flutter_mode is not None:
             document["flutterMode"] = self.flutter_mode
@@ -84,8 +85,13 @@ class DapAdapterError(RuntimeError):
         self.diagnostic = diagnostic
 
 
-def _program(configuration: FlutterConfiguration) -> Path:
-    return configuration.target or configuration.project_root / "lib" / "main.dart"
+def _program(configuration: FlutterConfiguration) -> str:
+    root = configuration.project_root.resolve()
+    target = (configuration.target or root / "lib" / "main.dart").resolve()
+    try:
+        return target.relative_to(root).as_posix()
+    except ValueError as error:
+        raise ValueError(f"Target must be inside project root: {target}") from error
 
 
 def _launch_tool_args(configuration: FlutterConfiguration) -> tuple[str, ...]:
@@ -118,8 +124,7 @@ def generate_debug_configurations(configuration: FlutterConfiguration, sdk: Reso
     ordered array and never becomes a shell command.
     """
     del sdk
-    root = configuration.project_root.resolve()
-    program = _program(configuration).resolve()
+    program = _program(configuration)
     adapter = _adapter(configuration)
     if adapter != DART_ADAPTER:
         raise ValueError(f"DAP adapter must be {DART_ADAPTER!r}, got {adapter!r}")
@@ -131,7 +136,7 @@ def generate_debug_configurations(configuration: FlutterConfiguration, sdk: Reso
             request="launch",
             type=FLUTTER_TYPE,
             program=program,
-            cwd=root,
+            cwd=ZED_WORKTREE_ROOT,
             flutter_mode=configuration.mode,
             device_id=configuration.device,
             tool_args=_launch_tool_args(configuration),
@@ -147,7 +152,7 @@ def generate_debug_configurations(configuration: FlutterConfiguration, sdk: Reso
         request="attach",
         type=FLUTTER_TYPE,
         program=program,
-        cwd=root,
+        cwd=ZED_WORKTREE_ROOT,
         vm_service_uri=attach_uri,
     )
     return DebugConfigurations((attach,))

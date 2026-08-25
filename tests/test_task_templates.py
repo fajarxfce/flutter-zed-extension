@@ -76,9 +76,10 @@ class TaskTemplateTests(unittest.TestCase):
         self.assertEqual(
             run.args,
             (
+                "flutter",
                 "run",
                 "--target",
-                str(self.root / "lib" / "main_staging.dart"),
+                "lib/main_staging.dart",
                 "--flavor",
                 "staging",
                 "--profile",
@@ -88,7 +89,32 @@ class TaskTemplateTests(unittest.TestCase):
             ),
         )
         self.assertEqual(run.cwd, self.root)
-        self.assertEqual(document[6]["command"], str(self.fake_flutter.resolve()))
+        self.assertEqual(document[6]["command"], "fvm")
+        self.assertEqual(document[6]["cwd"], "$ZED_WORKTREE_ROOT")
+        self.assertNotIn(str(self.root), json.dumps(document))
+        self.assertNotIn(str(self.fake_flutter.resolve()), json.dumps(document))
+
+    def test_system_serialization_uses_path_commands_and_relative_target(self) -> None:
+        configuration = FlutterConfiguration(
+            project_root=self.root,
+            sdk_mode="flutter",
+            target=self.root / "lib" / "main_staging.dart",
+            device=None,
+            flavor=None,
+            mode="debug",
+            args=(),
+            dap=None,
+            tmux=None,
+        )
+        document = generate_task_templates(configuration, self.sdk).as_json()
+        build_apk = next(task for task in document if task["label"] == "Flutter: Build APK")
+        format_task = next(task for task in document if task["label"] == "Flutter: Format (check)")
+        self.assertEqual(build_apk["command"], "flutter")
+        self.assertEqual(build_apk["args"], ["build", "apk", "--target", "lib/main_staging.dart", "--debug"])
+        self.assertEqual(format_task["command"], "dart")
+        self.assertEqual(format_task["args"], ["format", "--set-exit-if-changed", "lib/main_staging.dart"])
+        self.assertTrue(all(task["cwd"] == "$ZED_WORKTREE_ROOT" for task in document))
+        self.assertNotIn(str(self.root), json.dumps(document))
 
     def test_optional_selectors_only_emit_relevant_flags(self) -> None:
         configuration = FlutterConfiguration(
@@ -106,7 +132,11 @@ class TaskTemplateTests(unittest.TestCase):
         self.assertEqual(templates["Flutter: Build APK"].args, ("build", "apk", "--debug"))
         self.assertEqual(templates["Flutter: Build web"].args, ("build", "web", "--debug"))
         self.assertEqual(templates["Flutter: Run"].args, ("run", "--debug"))
-        self.assertEqual(templates["Flutter: Format (check)"].args, ("format", "--set-exit-if-changed", str(self.root)))
+        self.assertEqual(templates["Flutter: Format (check)"].args, ("format", "--set-exit-if-changed", "."))
+        document = generate_task_templates(configuration, self.sdk).as_json()
+        format_task = next(task for task in document if task["label"] == "Flutter: Format (check)")
+        self.assertEqual(format_task["command"], "dart")
+        self.assertEqual(format_task["cwd"], "$ZED_WORKTREE_ROOT")
 
     def test_analyze_execution_uses_exact_argv_and_root(self) -> None:
         task = self.task("Flutter: Analyze")
