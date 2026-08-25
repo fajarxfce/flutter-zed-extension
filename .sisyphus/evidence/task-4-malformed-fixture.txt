@@ -1,0 +1,4 @@
+command: python3 -c classify_fixture_project(malformed_pubspec)
+fixture: tests/fixtures/malformed_pubspec
+expected: invalid
+result: invalid

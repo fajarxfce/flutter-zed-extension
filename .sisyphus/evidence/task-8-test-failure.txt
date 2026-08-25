@@ -1,0 +1,13 @@
+Task 8 — Flutter test failure propagation
+
+Command:
+python3 -m unittest tests.test_task_templates.TaskTemplateTests.test_test_execution_propagates_failure_exit_and_stderr -v
+
+Result:
+test_test_execution_propagates_failure_exit_and_stderr ... ok
+
+Verified fake Flutter failure propagation:
+- argv: ["test", "--dart-define=API_ENV=staging"]
+- exit status: 1
+- stdout: empty and unmodified
+- stderr: exact fake Flutter configured-failure text, preserved verbatim

@@ -1,0 +1,14 @@
+Task 7 — FVM precedence
+
+Command:
+python3 -m unittest tests.test_sdk_resolution.SdkResolutionTests.test_fvm_wins_over_explicit_and_path_with_space_in_path -v
+
+Output:
+test_fvm_wins_over_explicit_and_path_with_space_in_path (tests.test_sdk_resolution.SdkResolutionTests.test_fvm_wins_over_explicit_and_path_with_space_in_path) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in <deterministic fake-fixture runtime>
+
+OK
+
+Assertion: a fake `.fvm/flutter_sdk` containing executable Flutter and Dart wins over distinct explicit and PATH fake SDKs. The explicit and system fixture directories contain spaces, and the selected fake binaries report `flutter fake-1.2.3` and `dart fake-1.2.3` through argv-only `--version` probes.

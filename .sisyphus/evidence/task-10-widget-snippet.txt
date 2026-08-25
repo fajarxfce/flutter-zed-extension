@@ -1,0 +1,13 @@
+Task 10 widget snippet evidence
+
+Command:
+python3 -m unittest tests.test_snippets.FlutterSnippetTests.test_widget_snippets_have_expected_triggers_and_placeholders -v
+
+Relevant assertions:
+- Flutter StatefulWidget uses trigger `stful`, linked `${1:WidgetName}` placeholders, a `${2:const Placeholder()}` body position, and final `$0` cursor position.
+- Flutter StatelessWidget uses trigger `stless`, linked `${1:WidgetName}` placeholders, a `${2:const Placeholder()}` body position, and final `$0` cursor position.
+
+Result:
+test_widget_snippets_have_expected_triggers_and_placeholders (...) ... ok
+
+This is deterministic metadata validation only; it does not invoke Zed.

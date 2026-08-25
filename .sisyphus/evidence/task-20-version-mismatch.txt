@@ -1,0 +1,17 @@
+Task 20 version mismatch evidence (restored from product-root source)
+
+Source evidence: /home/fajar/Projects/flutter-zed-extension/task-20-version-mismatch.txt
+Original evidence date: 2026-08-25
+Restoration purpose: place prior verified evidence at the plan-required path; no new live validation is claimed.
+
+Command (disposable /tmp/flutter-zed-release-mismatch copy):
+python3 scripts/release_check.py versions /tmp/flutter-zed-release-mismatch
+
+Setup: changed only the copied CHANGELOG.md heading from ## [0.1.0] to ## [9.9.9].
+
+Result: expected nonzero status (PASS).
+
+Observed diagnostic:
+release validation failed: version mismatch: extension.toml=0.1.0, pyproject.toml=0.1.0, CHANGELOG.md=9.9.9
+
+The diagnostic identifies every source and both conflicting version values; the product checkout was not modified for this negative test.

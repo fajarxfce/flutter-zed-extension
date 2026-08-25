@@ -1,0 +1,26 @@
+Task 5 documentation command audit
+Date: 2026-08-25
+Repository: /home/fajar/Projects/flutter-zed-extension
+
+Advertised locally runnable commands
+
+1. make check
+   Result: PASS
+   Expected scope: format, lint, manifest/configuration validation, build metadata, and unit tests.
+
+2. ./scripts/check.sh
+   Result: PASS
+   Expected scope: repository offline validation script.
+
+3. python3 scripts/validate_manifest.py extension.toml
+   Result: PASS
+   Expected scope: canonical manifest validation.
+
+4. python3 scripts/configuration.py .sisyphus/evidence/task-3-valid-config.json
+   Result: PASS
+   Expected scope: offline validation of the checked-in valid configuration fixture.
+
+Prerequisite-dependent behavior intentionally not run
+
+- Live Zed extension loading is not a locally runnable documentation command. The local Zed CLI/application is unavailable, so README.md labels it prerequisite-dependent and unverified.
+- No package installation, artifact publication, release creation, device execution, or tmux mutation was performed.

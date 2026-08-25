@@ -1,0 +1,22 @@
+Task 22 Windows native versus bridge guidance (restored from product-root source)
+
+Source evidence: /home/fajar/Projects/flutter-zed-extension/task-22-windows-guidance.txt
+Original status: PASS (documentation/evidence audit)
+Restoration purpose: place prior verified documentation evidence at the plan-required path; no new Windows, WSL, or live validation is claimed.
+
+Core configuration/template guidance
+- Windows-native configuration validation and project-local .zed/tasks.json / .zed/debug.json generation can work with a compatible Python and Flutter SDK.
+- This is supported guidance only: the checkout has no native-Windows execution, real Flutter/Dart SDK, DAP, or live-Zed evidence.
+- The core path has no tmux dependency. Use it as the fallback when the optional bridge is unavailable.
+
+Optional bridge guidance
+- The tmux bridge is unsupported and untested on native Windows. It is not native Zed terminal control.
+- WSL or Git Bash are conditional alternatives only when locally tested. Keep the bridge process, project, and explicitly configured tmux target pane in the same environment.
+- WSL bridge lifecycle is prerequisite-dependent because ownership verification uses /proc; validate local /proc semantics and the tmux server before relying on start/stop/interrupt/hot actions.
+- Do not infer WSL/Git-Bash validation from the passing Linux isolated-tmux tests.
+
+Evidence basis
+- README.md prerequisites and scope Windows/WSL statements.
+- .sisyphus/evidence/task-16-full-workflow.txt: isolated Linux tmux -L and fake SDK/DAP, not Windows/WSL.
+- task-18-interrupt-cleanup.txt: isolated Linux ownership/interrupt behavior.
+- task-19-foreign-resource.txt: isolated foreign-resource refusal.

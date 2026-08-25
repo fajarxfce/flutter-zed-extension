@@ -1,0 +1,13 @@
+Command:
+python3 -m unittest tests.test_project_setup.ProjectSetupTests.test_malformed_config_is_never_overwritten_or_partially_written -v
+
+Result:
+test_malformed_config_is_never_overwritten_or_partially_written (tests.test_project_setup.ProjectSetupTests.test_malformed_config_is_never_overwritten_or_partially_written) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.003s
+
+OK
+
+Evidence:
+The test provides malformed `.zed/tasks.json` alongside valid `.zed/debug.json`. Setup returns the actionable `configuration.invalid` diagnostic and asserts byte-for-byte equality for both source files, proving malformed configuration is never overwritten and the other file is not partially updated.

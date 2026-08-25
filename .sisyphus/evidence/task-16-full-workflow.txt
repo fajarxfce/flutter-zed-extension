@@ -1,0 +1,21 @@
+Task 16 full deterministic workflow evidence
+Command: python3 -m unittest tests.test_workflow_orchestration -v
+
+Test output:
+test_boundary_failures_are_stable_and_leave_unsafe_inputs_untouched (tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_boundary_failures_are_stable_and_leave_unsafe_inputs_untouched) ... ok
+test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs (tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.753s
+
+OK
+
+Assertions executed by the passing offline fixture:
+- detects a temporary Flutter project from lib/ metadata;
+- resolves temporary .fvm/flutter_sdk/bin/flutter and dart, recording exact argv ["--version"] for both;
+- generates .zed/tasks.json and .zed/debug.json through setup_project;
+- executes generated Flutter: Analyze with exact argv ["analyze", "--dart-define=FIXTURE=1"] and fixture-root cwd;
+- validates generated Dart launch JSON with the fake DAP adapter;
+- creates and destroys only a unique tmux -L flutter-zed-task16-<uuid> server;
+- starts an owned runner and executes only fixed HotOperation.RELOAD (r) and HotOperation.RESTART (R), with rR present in the isolated pane;
+- stops the owned runner. No real Flutter/Dart/Zed/DAP/device/network/default-tmux service is contacted.

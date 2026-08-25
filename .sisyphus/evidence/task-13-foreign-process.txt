@@ -1,0 +1,10 @@
+Command:
+python3 -m unittest tests.test_tmux_runner.TmuxRunnerTests.test_stop_refuses_foreign_process_without_changing_it -v
+
+Result:
+test_stop_refuses_foreign_process_without_changing_it (tests.test_tmux_runner.TmuxRunnerTests.test_stop_refuses_foreign_process_without_changing_it) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.016s
+
+OK

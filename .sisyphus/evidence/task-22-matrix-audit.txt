@@ -1,0 +1,16 @@
+Task 22 compatibility matrix reference audit (restored from product-root source)
+
+Source evidence: /home/fajar/Projects/flutter-zed-extension/task-22-matrix-audit.txt
+Restoration purpose: place prior verified evidence at the plan-required path; no new live validation is claimed.
+
+Command summary:
+A Python assertion script read COMPATIBILITY.md; asserted its required evidence names (including task-16, task-18, task-19, task-20, and task-22 windows guidance); asserted that relevant Linux rows were marked Verified and cited their evidence; and asserted the Windows-native tmux Unsupported, Conditional/unverified, and future official Zed API disclosures.
+
+Result:
+MATRIX_REFERENCES=PASS
+
+Audit assertions:
+- Every verified matrix row names a passing local evidence artifact.
+- The matrix explicitly distinguishes fixture/Linux verification from live prerequisite-dependent Zed, Flutter/Dart, DAP, device, and platform validation.
+- FVM and tmux bridge are optional; Windows-native tmux bridge is unsupported; WSL/Git-Bash bridge language is conditional/unverified.
+- Migration covers release version consistency, configuration contract, generated-file ownership, core-template fallback, and versioned future-API migration without claiming an accepted API.

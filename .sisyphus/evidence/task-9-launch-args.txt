@@ -1,0 +1,17 @@
+Task 9 — debug launch argument mapping
+
+Command:
+python3 -m unittest tests.test_dap_templates.DebugConfigurationTests.test_fake_adapter_receives_exact_launch_json_without_tmux -v
+
+Output:
+test_fake_adapter_receives_exact_launch_json_without_tmux (tests.test_dap_templates.DebugConfigurationTests.test_fake_adapter_receives_exact_launch_json_without_tmux) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.02s
+
+OK
+
+Assertion captured by the fake adapter:
+{"adapter": "Dart", "cwd": "<temporary>/example app", "deviceId": "emulator-5554", "flutterMode": "profile", "label": "Flutter: Launch", "program": "<temporary>/example app/lib/main_staging.dart", "request": "launch", "toolArgs": ["--flavor", "staging", "--dart-define=API_ENV=staging", "--trace-startup"], "type": "flutter", "useFvm": true}
+
+Result: the fake adapter received exactly ordered structured launch fields; no Flutter, device, tmux, or real DAP command was run.

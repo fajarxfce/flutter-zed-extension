@@ -1,0 +1,38 @@
+F3 real fixture/integration QA — rerun after F2 workspace parser fix
+Date: 2026-08-25
+Workspace: /home/fajar/Projects/flutter-zed-extension
+
+Focused isolated-fixture command:
+python3 -m unittest tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_boundary_failures_are_stable_and_leave_unsafe_inputs_untouched tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_unicode_spaced_path_preserves_root_args_and_environment tests.test_tmux_runner.TmuxRunnerTests.test_start_refuses_foreign_process_without_changing_it tests.test_tmux_runner.TmuxRunnerTests.test_hot_restart_refuses_stale_state_without_sending_input tests.test_sdk_resolution.SdkResolutionTests.test_missing_sdk_has_stable_actionable_error tests.test_project_setup.ProjectSetupTests.test_non_flutter_project_is_refused_before_creating_zed_files tests.test_task_templates.TaskTemplateTests.test_templates_emit_zed_json_with_stable_labels_and_argv -v
+
+Result: Ran 8 tests in 5.513s — OK.
+
+Scenario evidence
+1. Full workflow — PASS
+   Temporary Flutter/FVM fixture detects a project, resolves fake Flutter/Dart, writes generated Zed task/debug files, runs Analyze with exact argv, validates fake DAP launch JSON, and runs owned runner hot reload/restart.
+2. Missing SDK — PASS
+   Missing fake FVM SDK returns a stable actionable sdk.missing diagnostic; no host-SDK or network fallback is used.
+3. Invalid project — PASS
+   Non-Flutter project is refused before .zed files are created.
+4. Stale target — PASS
+   Tampered owned-runner identity rejects restart and sends no pane input.
+5. Foreign process — PASS
+   Runner start refuses a foreign pane without changing it.
+6. Spaced/unicode path — PASS
+   Fixture path "unicodé fixture app" preserves exact executable, cwd, arguments, and sanitized direct-execution environment.
+7. Package check — PASS
+   make check completed successfully: format, compile/lint, manifest/snippet validation, imports/typecheck surrogate, build metadata validation, release check, and the complete offline unittest suite.
+
+Parser-fix regression coverage
+- Existing package/parser coverage remains present in test_project_detection.ProjectDetectionTests.test_dart_package_has_no_flutter_run_configuration.
+- The F2 regression is additionally covered by test_project_detection.ProjectDetectionTests.test_workspace_list_followed_by_top_level_key_remains_a_list.
+
+Isolation audit
+- Tests use temporary project fixtures and fake Flutter/DAP executables.
+- tmux tests create UUID-scoped disposable servers with `tmux -L`; teardown kills only those servers.
+- No default tmux server or user tmux resource is contacted.
+- No real device, host Flutter SDK, or network access is required.
+- basedpyright remains unavailable by stated project context; make check's configured offline typecheck surrogate passed.
+
+Scenarios [7/7] | Integration [2/2] | Edge Cases [5] | VERDICT: PASS
+BINARY VERDICT: PASS

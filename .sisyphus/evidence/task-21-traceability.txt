@@ -1,0 +1,61 @@
+Task 21 — upstream API proposal traceability audit
+Generated: 2026-08-25
+Scope: UPSTREAM_ZED_API_PROPOSAL.md only. Proposed APIs are explicitly not current/accepted Zed APIs.
+
+REPRODUCIBLE AUDIT COMMANDS
+1. grep -nE 'not provide|native command-palette|device picker|custom panel|save hooks|terminal stdin|VS Code' README.md
+2. grep -nE 'Capability Matrix|Device picker|command palette|save hook|custom panel|no runtime command provider' CONFIGURATION.md
+3. python3 -m unittest tests.test_tmux_target.TmuxTargetTests.test_exact_explicit_target_is_accepted_without_mutation tests.test_tmux_target.TmuxTargetTests.test_missing_pane_is_refused_without_mutation -v
+4. python3 -m unittest tests.test_tmux_runner.TmuxRunnerTests.test_hot_operations_send_only_fixed_literals_to_owned_runner tests.test_tmux_runner.TmuxRunnerTests.test_hot_restart_refuses_stale_state_without_sending_input tests.test_tmux_runner.TmuxRunnerTests.test_start_refuses_foreign_process_without_changing_it tests.test_tmux_runner.TmuxRunnerTests.test_stop_refuses_foreign_process_without_changing_it -v
+5. python3 -m unittest tests.test_project_setup -v
+6. Read official documentation, accessed 2026-08-25:
+   https://zed.dev/docs/extensions/developing-extensions
+   https://zed.dev/docs/extensions/capabilities
+
+CLAIM-TO-EVIDENCE MAP
+
+C1. Current product has no native extension commands, device picker, custom panel, save hooks, terminal stdin, or VS Code parity.
+    Local source: README.md:3-5.
+    Corroboration: CONFIGURATION.md:70-78 capability matrix identifies no runtime command provider and marks device picker/command palette/save hook/custom panel unsupported.
+    Proposal sections: Summary; Evidence and current boundary; Use cases; Non-goals.
+
+C2. Current product uses generated project-local task/debug JSON and manifest LSP/snippets, rather than a native terminal controller.
+    Local source: README.md:3, 12; CONFIGURATION.md:62-68.
+    Proposal sections: Evidence and current boundary; Migration path; Alternatives.
+
+C3. The external runner is tmux-only, explicitly addressed, and does not control Zed's terminal.
+    Local source: README.md:14-15, 116-139, 153; CONFIGURATION.md:46-58.
+    Reproducible evidence: .sisyphus/evidence/task-12-explicit-target.txt and task-12-missing-pane.txt; commands 3 above.
+    Proposal sections: Evidence and current boundary; Scoped process and stdin; Alternatives; Migration.
+
+C4. Current hot operations are intentionally only literal r/R and refuse stale targets before input.
+    Local source: README.md:132-139.
+    Reproducible evidence: .sisyphus/evidence/task-14-hot-reload.txt and task-14-stale-target.txt; command 4 above.
+    Proposal consequence: fixed declared stdin tokens; no arbitrary text, escape sequence, or terminal selection.
+
+C5. Current lifecycle control protects foreign processes/resources and uses ownership identity before stop/input.
+    Local source: CONFIGURATION.md:54-58; README.md:132-139.
+    Reproducible evidence: .sisyphus/evidence/task-13-foreign-process.txt and task-19-foreign-resource.txt; command 4 above.
+    Proposal consequence: non-forgeable extension-owned process handles only; no PID/tmux/existing-terminal addressing.
+
+C6. Existing configuration and subprocess boundaries prohibit shell concatenation and preserve non-destructive behavior.
+    Local source: README.md:13; CONFIGURATION.md:42, 48-50, 76; SDK_RESOLUTION.md:13-19.
+    Reproducible evidence: .sisyphus/evidence/task-19-injection-probe.txt.
+    Proposal consequence: argv-only process specification, permission disclosure of argv/cwd, typed denials, and no shell fallback.
+
+C7. Existing task/configuration workflow preserves unrelated user configuration and works without tmux.
+    Local source: README.md:3, 118; CONFIGURATION.md:70-78.
+    Reproducible evidence: .sisyphus/evidence/task-15-idempotency-preservation.txt and task-17-no-tmux.txt; command 5 above.
+    Proposal consequence: retain tasks/debug JSON fallback and make future APIs optional/additive.
+
+C8. Official documented extension features do not list the four requested surfaces.
+    Official source: https://zed.dev/docs/extensions/developing-extensions (accessed 2026-08-25), “Extension Features”: languages, debuggers, themes, icon themes, snippets, MCP servers.
+    Careful wording used in proposal: “does not document,” not “does not exist.”
+    Proposal sections: Evidence and current boundary; Status.
+
+C9. Official capability system supports user-restrictable extension capabilities and documents process:exec denial behavior.
+    Official source: https://zed.dev/docs/extensions/capabilities (accessed 2026-08-25), “Restricting capabilities” and “process:exec.”
+    Proposal consequence: extend capability gating; rejected operations return typed errors, without a bypass/fallback.
+
+AUDIT RESULT
+All present-tense capability claims in the proposal are either (a) local product claims with a cited local path/reproducible test, or (b) narrowly worded official-documentation observations with a URL. All API shapes, permission kinds, lifecycle behavior, UI concepts, and migration actions are labeled proposed/illustrative and are not represented as available Zed behavior.

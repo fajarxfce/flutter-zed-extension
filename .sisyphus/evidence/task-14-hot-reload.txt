@@ -1,0 +1,13 @@
+Command:
+python3 -m unittest tests.test_tmux_runner.TmuxRunnerTests.test_hot_operations_send_only_fixed_literals_to_owned_runner -v
+
+Result:
+test_hot_operations_send_only_fixed_literals_to_owned_runner (tests.test_tmux_runner.TmuxRunnerTests.test_hot_operations_send_only_fixed_literals_to_owned_runner) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.293s
+
+OK
+
+Evidence:
+The test creates only a unique disposable tmux -L socket, starts a verified owned runner, and captures the pane before and after each operation. It asserts reload sends exactly literal r, restart sends exactly literal R, and the captured pane changes from r to rR.

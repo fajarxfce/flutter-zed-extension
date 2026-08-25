@@ -1,0 +1,14 @@
+Task 8 — analyze task success
+
+Command:
+python3 -m unittest tests.test_task_templates.TaskTemplateTests.test_analyze_execution_uses_exact_argv_and_root -v
+
+Result:
+test_analyze_execution_uses_exact_argv_and_root ... ok
+
+Verified fake Flutter invocation:
+- executable: resolver-selected temporary fake Flutter path
+- argv: ["analyze", "--dart-define=API_ENV=staging"]
+- cwd: exact configured project root (including its space)
+- exit status: 0
+- stdout: preserved verbatim

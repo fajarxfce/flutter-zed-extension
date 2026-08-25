@@ -1,0 +1,54 @@
+F1 Plan compliance audit
+
+Scope: Re-audit of the complete plan against source, documentation, tests, and exact product-relative evidence paths.
+Corroboration: `make check` passed on 2026-08-25 (format, compile/import, manifest/snippet validation, release-version validation, and 84 tests).
+
+Must Have [5/5]
+[PASS] Honest current-Zed capability boundaries are explicit in README.md, CONFIGURATION.md, COMPATIBILITY.md, and UPSTREAM_ZED_API_PROPOSAL.md.
+[PASS] Tmux is optional, requires explicit session/window/pane, validates exact target identity, and preserves user-owned resources.
+[PASS] Configuration, detection, resolution, task generation, and DAP templates handle Flutter, Dart, and opt-in FVM.
+[PASS] Missing SDK/device/adapter, invalid project/configuration, stale/foreign tmux, command failure, injection, and path-hardening negative paths are tested/evidenced.
+[PASS] Agent-executed task evidence exists at every required plan path.
+
+Guardrails [6/6]
+[PASS] Product source contains no Zed-core modification.
+[PASS] No native command-palette, status/device UI, panel, save-hook, or terminal-stdin capability is implemented or claimed; the upstream document is marked proposal-only.
+[PASS] Runtime code does not discover tmux targets or create/kill/recreate session/window/pane resources; all send operations target an exact configured and ownership-verified pane.
+[PASS] DAP and standard Flutter tasks do not require tmux.
+[PASS] Native Windows tmux is unsupported; WSL/Git Bash remains conditional/prerequisite-dependent.
+[PASS] Scope remains a Flutter Zed workflow foundation, not a full IDE/emulator/DevTools/mobile-automation product.
+
+Tasks [22/22]
+[PASS] Task 1: reconnaissance and optional-tool inventory evidence exists: task-1-reconnaissance.txt, task-1-optional-tools.txt.
+[PASS] Task 2: manifest validation, no-tmux loading, and unsupported-native-API boundary are evidenced.
+[PASS] Task 3: typed configuration/capability boundary and explicit-target rejection are evidenced: task-3-valid-config.txt, task-3-ambiguous-tmux.txt.
+[PASS] Task 4: deterministic offline/malformed fixtures and harness evidence exist.
+[PASS] Task 5: README/release conventions and capability disclosures are evidenced.
+[PASS] Task 6: Flutter/Dart-only detection positive and negative evidence exists.
+[PASS] Task 7: FVM precedence and missing-SDK diagnostics are evidenced.
+[PASS] Task 8: parameterized task success and failure propagation are evidenced.
+[PASS] Task 9: DAP launch argument mapping and missing-adapter diagnostics are evidenced.
+[PASS] Task 10: Flutter snippets/file association evidence exists without changing Dart behavior.
+[PASS] Task 11: stable diagnostics preserve command context and stderr.
+[PASS] Task 12: only explicit tmux targets are accepted; missing pane fails safely.
+[PASS] Task 13: owned runner starts in the exact pane; foreign process refusal is evidenced.
+[PASS] Task 14: only literal r/R actions are sent after runner/target validation; stale targets are blocked.
+[PASS] Task 15: idempotent, dry-run setup preserves unrelated config and rejects malformed files: task-15-idempotent-setup.txt, task-15-malformed-config.txt.
+[PASS] Task 16: full fixture workflow and expected boundary diagnostic evidence exists.
+[PASS] Task 17: fresh-project and no-tmux documentation/workflow audits exist.
+[PASS] Task 18: spaced/Unicode paths and interrupt cleanup use isolated resources: task-18-spaced-path.txt, task-18-interrupt-cleanup.txt.
+[PASS] Task 19: injection and foreign-resource probes fail without mutation.
+[PASS] Task 20: clean artifact and version mismatch evidence exists: task-20-clean-artifact.txt, task-20-version-mismatch.txt.
+[PASS] Task 21: proposal traceability/non-goals evidence exists and does not promise unsupported APIs.
+[PASS] Task 22: compatibility matrix and Windows guidance evidence exists: task-22-matrix-audit.txt, task-22-windows-guidance.txt.
+
+Final checklist [7/7]
+[PASS] Core extension path works without tmux.
+[PASS] Detection and SDK/FVM valid/negative fixtures pass.
+[PASS] Tasks and DAP preserve arguments and propagate failures.
+[PASS] Tmux hot actions require explicit owned targets.
+[PASS] Unsupported native Zed APIs are not claimed as implemented.
+[PASS] Documentation and compatibility claims are bounded by traceable evidence.
+[PASS] F1 verdict recorded below; F2-F4 are independent final reviewers.
+
+Must Have [5/5] | Guardrails [6/6] | Tasks [22/22] | VERDICT: APPROVE

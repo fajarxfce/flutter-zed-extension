@@ -1,0 +1,9 @@
+Task 12 — explicit tmux pane target accepted
+
+Command:
+python3 -m unittest tests.test_tmux_target.TmuxTargetTests.test_exact_explicit_target_is_accepted_without_mutation -v
+
+Result:
+test_exact_explicit_target_is_accepted_without_mutation (tests.test_tmux_target.TmuxTargetTests.test_exact_explicit_target_is_accepted_without_mutation) ... ok
+
+The test creates only a disposable tmux server under a unique -L socket, configures known:app.%0, and calls the production inspector with server_options=("-L", socket). The inspector accepts exactly session=known, window=app, pane=%0 via argv-only display-message. The isolated server still contains exactly the original known session after inspection.

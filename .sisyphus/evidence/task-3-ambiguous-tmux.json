@@ -1,0 +1,7 @@
+{
+  "project_root": ".",
+  "tmux": {
+    "session": "flutter",
+    "window": "app"
+  }
+}

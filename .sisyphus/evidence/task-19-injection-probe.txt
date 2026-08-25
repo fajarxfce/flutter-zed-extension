@@ -1,0 +1,9 @@
+Command:
+python3 -c <isolated configuration metacharacter probe>
+
+Result:
+CONFIG_METACHARACTERS_RETAINED_AS_DATA=PASS
+SENTINEL_CREATED=NO
+
+Audit:
+Configuration accepts metacharacters only as individual data values. All audited subprocess calls use argv with shell=False; tmux pane commands quote argv with shlex.join. No shell or process executed the sentinel payload.

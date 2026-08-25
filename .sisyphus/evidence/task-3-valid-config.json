@@ -1,0 +1,17 @@
+{
+  "project_root": ".",
+  "sdk_mode": "fvm",
+  "device": "emulator-5554",
+  "flavor": "staging",
+  "mode": "debug",
+  "args": ["--dart-define=API_ENV=staging"],
+  "dap": {
+    "adapter": "Dart",
+    "request": "launch"
+  },
+  "tmux": {
+    "session": "flutter",
+    "window": "app",
+    "pane": "%3"
+  }
+}

@@ -1,0 +1,23 @@
+Task 17 fresh-project user documentation evidence
+
+Documented command:
+python3 -m unittest tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs -v
+
+Output:
+test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs (tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.431s
+
+OK
+
+Clean fixture assertions exercised by the command:
+- creates a temporary Flutter-shaped project with pubspec.yaml and lib/main.dart;
+- creates a usable temporary project-local .fvm/flutter_sdk with fake flutter and dart executables;
+- resolves that FVM SDK using argv-only --version probes;
+- generates the project's .zed/tasks.json and .zed/debug.json through setup_project;
+- executes the generated Flutter: Analyze argv using the fixture-root cwd;
+- validates the generated Dart launch configuration with the explicit fake DAP adapter;
+- when tmux is installed, starts/stops an owned runner only in a disposable unique -L tmux server and sends only literal r and R hot operations.
+
+The fixture cleans itself up and does not require a host Flutter SDK, FVM executable, Zed application/CLI, real DAP adapter, device, network, consumer project, or default tmux server. It is offline evidence of project configuration generation and isolated bridge behavior, not proof that Zed live-loaded the extension.

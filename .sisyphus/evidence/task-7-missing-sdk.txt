@@ -1,0 +1,14 @@
+Task 7 — missing SDK
+
+Command:
+python3 -m unittest tests.test_sdk_resolution.SdkResolutionTests.test_missing_sdk_has_stable_actionable_error -v
+
+Output:
+test_missing_sdk_has_stable_actionable_error (tests.test_sdk_resolution.SdkResolutionTests.test_missing_sdk_has_stable_actionable_error) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in <deterministic fake-fixture runtime>
+
+OK
+
+Assertion: with no executable project-local FVM SDK and an empty PATH, `resolve_sdk` raises `SdkResolutionError` beginning `No usable Flutter SDK` and ending with `PATH: SDK not found: flutter, dart missing from PATH. Install Flutter or configure an SDK directory.` No real Flutter, Dart, FVM, shell, SDK download, or PATH mutation occurs.

@@ -1,0 +1,16 @@
+Task 5 capability disclosure audit
+Date: 2026-08-25
+Repository: /home/fajar/Projects/flutter-zed-extension
+
+Documentation reviewed: README.md and CONFIGURATION.md
+
+Confirmed disclosures
+
+- The repository is a manifest-only Dart language-server registration scaffold; it does not claim VS Code parity.
+- Live Zed loading is prerequisite-dependent and unverified locally because the Zed CLI/application is unavailable.
+- Tmux is optional and deferred. Its configuration is opt-in; no bridge or tmux command execution exists.
+- No native command-palette action, device selector, custom panel, save hook, terminal stdin control, hot reload, or hot restart implementation exists.
+- Flutter project detection, SDK resolution, FVM execution, task generation, and DAP execution are deferred; configuration validates future inputs only.
+- Release documentation describes semantic-versioning, changelog, review, evidence, and future official Zed publishing verification as conventions. It does not claim CI, registry, publisher, packaging, signing, or release-provider configuration.
+
+Result: PASS — supported behavior, unavailable behavior, and prerequisite-dependent live behavior are explicitly separated.

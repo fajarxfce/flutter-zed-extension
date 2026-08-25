@@ -1,0 +1,9 @@
+Task 12 — missing tmux pane refusal
+
+Command:
+python3 -m unittest tests.test_tmux_target.TmuxTargetTests.test_missing_pane_is_refused_without_mutation -v
+
+Result:
+test_missing_pane_is_refused_without_mutation (tests.test_tmux_target.TmuxTargetTests.test_missing_pane_is_refused_without_mutation) ... ok
+
+The test creates only a disposable tmux server under a unique -L socket, then requests known:app.%99. The production inspector raises DiagnosticError with code tmux.failed because tmux cannot prove the exact configured pane identity. The isolated server still contains exactly the original known session; no production operation creates, kills, selects, renames, attaches to, or sends input to a tmux resource.

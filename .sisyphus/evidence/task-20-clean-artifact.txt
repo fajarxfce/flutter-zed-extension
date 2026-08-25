@@ -1,0 +1,15 @@
+Task 20 clean artifact evidence (restored from product-root source)
+
+Source evidence: /home/fajar/Projects/flutter-zed-extension/task-20-clean-artifact.txt
+Original evidence date: 2026-08-25
+Restoration purpose: place prior verified evidence at the plan-required path; no new packaging or live validation is claimed.
+
+Command:
+make check && make package && python3 scripts/release_check.py archive dist/flutter-zed-extension.tar.gz && tar -tzf dist/flutter-zed-extension.tar.gz
+
+Result: PASS
+- make check completed the offline suite, including release metadata validation and release automation tests.
+- make package created dist/flutter-zed-extension.tar.gz with normalized gzip/tar metadata and sorted members.
+- Archive inspection passed: clean archive: dist/flutter-zed-extension.tar.gz.
+- The artifact member inspection rejected no excluded entries: no .sisyphus, tests, fixtures, cache directories, dist, bytecode, secret-shaped filenames, unsafe paths, links, or /home/ absolute local-path content.
+- A final forbidden-member grep over tar -tzf returned no matches.

@@ -1,0 +1,23 @@
+Task 17 no-tmux core fallback evidence
+
+Documented command:
+python3 -m unittest tests.test_project_setup -v
+
+Output:
+test_dry_run_merges_owned_entries_and_repeat_is_idempotent (tests.test_project_setup.ProjectSetupTests.test_dry_run_merges_owned_entries_and_repeat_is_idempotent) ... ok
+test_malformed_config_is_never_overwritten_or_partially_written (tests.test_project_setup.ProjectSetupTests.test_malformed_config_is_never_overwritten_or_partially_written) ... ok
+test_non_flutter_project_is_refused_before_creating_zed_files (tests.test_project_setup.ProjectSetupTests.test_non_flutter_project_is_refused_before_creating_zed_files) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.017s
+
+OK
+
+No-tmux assertions exercised by the command:
+- detects a temporary Flutter-shaped project and safely generates .zed/tasks.json and .zed/debug.json;
+- preserves unrelated task settings and user entries while replacing only stable generated labels;
+- produces a dry-run unified diff without mutating files, then is idempotent after setup;
+- refuses malformed or wrong-shaped existing Zed JSON without overwriting it;
+- refuses a non-Flutter project without creating .zed metadata.
+
+This command imports no tmux runner path and does not require tmux, FVM, a Flutter SDK, Zed, a device, network access, or a consumer project. It verifies the documented core configuration-generation fallback only; generated files still need a locally installed Zed and Dart adapter for live task/debug use.

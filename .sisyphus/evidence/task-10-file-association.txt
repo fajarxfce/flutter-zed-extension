@@ -1,0 +1,11 @@
+Task 10 file-association evidence
+
+Command:
+python3 scripts/validate_snippets.py extension.toml
+
+Output:
+snippet metadata valid: extension.toml
+association: Flutter buffers only; Dart and unknown files are unaffected
+
+Result:
+The supported `snippets = ["./snippets/flutter.json"]` manifest path uses the lowercase filename to scope the metadata to Flutter buffers. It does not add language grammar metadata, change the existing Dart language-server registration, or associate unknown files. This is deterministic metadata validation only; it does not invoke Zed.

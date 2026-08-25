@@ -1,0 +1,15 @@
+Command:
+python3 scripts/configuration.py .sisyphus/evidence/task-3-valid-config.json
+
+Result:
+configuration valid: .sisyphus/evidence/task-3-valid-config.json
+project root: /home/fajar/Projects/flutter-zed-extension/.sisyphus/evidence
+sdk mode: fvm; Flutter mode: debug
+tmux target: explicit
+
+Normalized outcome:
+- project_root resolves to the evidence directory.
+- sdk_mode is fvm without an FVM dependency probe.
+- device is emulator-5554; flavor is staging; mode is debug.
+- args preserves --dart-define=API_ENV=staging.
+- DAP is Dart launch; tmux is the explicit flutter/app/%3 target.

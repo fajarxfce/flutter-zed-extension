@@ -1,0 +1,13 @@
+Task 18 isolated interrupt cleanup evidence (restored from product-root source)
+
+Source evidence: /home/fajar/Projects/flutter-zed-extension/task-18-interrupt-cleanup.txt
+Restoration purpose: place prior verified evidence at the plan-required path; no new live validation is claimed.
+
+Command:
+python3 -m unittest tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_interrupt_stops_only_owned_runner_and_preserves_target -v
+
+Result: PASS
+
+The test starts a UUID-scoped tmux -L server, creates only known:app.%0 in that server, starts an owned disposable Python runner, and invokes interrupt_runner. SIGINT is sent only after token, PID start-time, and explicit target verification. The owned runner becomes stopped-owned while display-message confirms known\tapp\t%0 still exists. Teardown kills only the isolated -L server.
+
+No default tmux server, user tmux resource, host Flutter, device, or network is used.

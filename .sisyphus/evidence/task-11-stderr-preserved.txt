@@ -1,0 +1,14 @@
+Task 11 — stderr preservation
+
+Command:
+python3 -m unittest tests.test_diagnostics.DiagnosticTests.test_sdk_process_failure_preserves_exact_stderr_and_command -v
+
+Output:
+test_sdk_process_failure_preserves_exact_stderr_and_command (tests.test_diagnostics.DiagnosticTests.test_sdk_process_failure_preserves_exact_stderr_and_command) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in <deterministic fake-fixture runtime>
+
+OK
+
+Assertion: a fake `flutter --version` exits with status `1` and writes the exact bytes decoded as `flutter: configured version failure\n` to stderr. Its `process.failed` diagnostic retains argv `(fake_flutter_path, "--version")`, `exit_status=1`, `stdout=""`, and that stderr value unchanged.

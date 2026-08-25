@@ -1,0 +1,23 @@
+F2 Code quality and security review
+Date: 2026-08-25
+Workspace: /home/fajar/Projects/flutter-zed-extension
+
+Defect fixed
+- Reproduced `test_project_detection.ProjectDetectionTests.test_workspace_root_requires_declared_workspace_membership`: valid block-list YAML (`workspace:\n  - packages/app`) was parsed as a mapping and produced `workspace_root=None`.
+- Fixed `scripts/project_detection.py`: an empty mapping placeholder is converted to a list on the first valid list item, and the parser clears pending list state after that item.
+- Added regression coverage: `test_workspace_list_followed_by_top_level_key_remains_a_list` verifies the list remains typed correctly when followed by another top-level key.
+
+Verification executed
+- `python3 -m unittest tests.test_project_detection -v`: PASS, 7/7.
+- `make check`: PASS. Format, compile/import validation, manifest/snippet validation, build metadata validation, release version validation, and full unittest discovery passed (59 tests).
+- `make release-check`: PASS; release versions consistent: 0.1.0.
+- Python LSP diagnostics: unavailable because the configured `basedpyright-langserver` is not installed. The repository's configured compile/import check passed.
+
+Security review
+- Subprocess inventory (grep and ast-grep): production execution uses argv arrays. No `shell=True`, `os.system`, `os.popen`, `eval`, or `exec` matches.
+- The intentional tmux pane-input bridge uses `shlex.quote`/`shlex.join`; direct subprocess calls use `shell=False` where shell behavior could be relevant. `runtime.safe_environment` removes BASH_ENV, CDPATH, and ENV.
+- Tmux operations validate an explicit target and exact inspected session/window/pane identity. Runner signal operations require a matching PID start-time and `/proc` ownership token; foreign/no-owned runner states refuse mutation.
+- State writes use exclusive creation and 0600 permissions. Generated Zed files are written atomically and set to 0600. Release checks reject unsafe archive paths, links, development artifacts, and secret-named files. `pyproject.toml` declares no runtime/build dependencies.
+- Residual reviewed constraints: tmux pane injection necessarily depends on a trusted POSIX-compatible shell (the idle-shell allow-list includes fish although shlex quoting is POSIX-oriented); the ownership token is visible to same-UID processes; CI action tags and apt tmux are not immutable. These are documented hardening opportunities, not regressions in the tested ownership or injection boundaries.
+
+Build PASS | Lint PASS | Tests 59/59 | Security PASS | VERDICT: PASS

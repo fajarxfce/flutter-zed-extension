@@ -1,0 +1,53 @@
+F4 Scope fidelity and packaging audit
+Date: 2026-08-25
+
+Audit inputs and independence
+- Read the complete active plan at `/home/fajar/.sisyphus/plans/flutter-zed-extension.md`, including its objectives, guardrails, Tasks 1-22, and final-audit requirements.
+- Re-audited current source, documentation, release metadata, task evidence, and a freshly generated archive after the F2 project-detection correction.
+- Product code and package configuration were not modified. `make package` only produced the ignored local archive used for inspection.
+
+Plan Tasks [22/22 compliant]
+[PASS] 1. Reconnaissance evidence inventories repository tools and classifies FVM/tmux as optional.
+[PASS] 2. `extension.toml` supplies Flutter metadata, Dart language-server registration, and snippets; `make check` validates manifest/snippet boundaries.
+[PASS] 3. `configuration.py` and CONFIGURATION.md require all explicit tmux target components and separate generated configuration from native Zed capabilities.
+[PASS] 4. Offline tests/fixtures and task evidence exist; development fixtures are excluded from release packaging.
+[PASS] 5. README release instructions, CHANGELOG, `pyproject.toml`, and manifest establish release/documentation conventions.
+[PASS] 6. Current `project_detection.py` remains a read-only metadata classifier; the F2 correction is covered by the current tests and does not broaden scope or invoke tools.
+[PASS] 7. SDK/FVM resolution remains opt-in for FVM and reports missing SDKs without download/installation behavior.
+[PASS] 8. Task templates and evidence cover generated Flutter-task success and failure behavior.
+[PASS] 9. DAP templates and evidence cover launch mapping and actionable missing-adapter behavior.
+[PASS] 10. Flutter snippets/editor metadata are supplied without altering Dart behavior.
+[PASS] 11. Diagnostics preserve stable command context and stderr.
+[PASS] 12. tmux targets require exact configured session/window/pane identity; no target discovery is implemented.
+[PASS] 13. Runner lifecycle is ownership-gated and refuses foreign processes/resources.
+[PASS] 14. Hot actions are fixed literal `r`/`R` operations and stale targets refuse safely.
+[PASS] 15. Project setup safely/idempotently generates only project-local `.zed/tasks.json` and `.zed/debug.json`.
+[PASS] 16. Full fixture workflow and boundary failures are evidenced.
+[PASS] 17. Current docs explain no-tmux core operation and prerequisite-dependent live use.
+[PASS] 18. Runtime hardening evidence covers argv execution, paths, environment hooks, and interrupt cleanup.
+[PASS] 19. Security/non-destructive evidence covers injection and foreign-resource refusal.
+[PASS] 20. Release automation validates versions, creates deterministic archives, and revalidates them.
+[PASS] 21. `UPSTREAM_ZED_API_PROPOSAL.md` begins: "Proposal only — no API described here is accepted, implemented, or required by current Zed releases." Illustrative APIs are pseudocode, not product claims.
+[PASS] 22. COMPATIBILITY.md distinguishes fixture verification from live validation; native-Windows tmux is unsupported and WSL/Git-Bash bridge use is conditional.
+
+Scope [CLEAN]
+[PASS] The repository scope remains a Flutter/Dart Zed workflow foundation: LSP/snippet metadata, project detection, SDK selection, generated project-local task/debug configuration, and an optional external tmux bridge.
+[PASS] README explicitly rejects claims of a published workflow, VS Code compatibility layer, native Zed terminal controller, command-palette actions, device picker, panel, save hooks, terminal stdin, and generic VS Code debug parity.
+[PASS] A Python-source claim scan found no implementations of command/keybinding registration, command palette, terminal stdin, device picker, panel, save hook, or native-Zed APIs.
+[PASS] Native API names appear only in the explicitly marked proposal, which states that current official documentation does not document those extension capabilities.
+[PASS] README, CONFIGURATION.md, COMPATIBILITY.md, and the proposal consistently describe the tmux path as optional, external, explicitly targeted, ownership-gated, and not native Zed terminal control.
+[PASS] No Zed-core changes, complete-IDE expansion, emulator/DevTools replacement, or unrelated mobile automation were found.
+
+Release metadata [CLEAN]
+[PASS] Fresh `make package` ran `make release-check`; `extension.toml`, `pyproject.toml`, and CHANGELOG.md consistently report 0.1.0.
+[PASS] CI runs `make check` and `make package`; tmux integration remains opt-in with `RUN_TMUX_TESTS == 'true'`.
+
+Artifact [CLEAN]
+[PASS] Fresh command: `make package`.
+[PASS] `dist/flutter-zed-extension.tar.gz` contains 29 members and passes repository archive validation before and after packaging.
+[PASS] Independent inspection: `sorted=True`; normalized uid/gid/mtime and empty owner/group metadata; `links=[]`; `unsafe_paths=[]`; `embedded_local_paths=[]`.
+[PASS] No forbidden development parts (`.git`, `.sisyphus`, tests, caches, virtual environments, `dist`) are present.
+[PASS] No fixture/fake-tool leakage or task-evidence leakage is present.
+[PASS] Archive contains only documentation, release metadata, CI, release/runtime scripts, manifest, and snippets.
+
+Tasks [22/22 compliant] | Scope [CLEAN] | Artifact [CLEAN] | VERDICT: PASS

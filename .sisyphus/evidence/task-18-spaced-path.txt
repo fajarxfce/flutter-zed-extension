@@ -1,0 +1,13 @@
+Task 18 isolated path evidence (restored from product-root source)
+
+Source evidence: /home/fajar/Projects/flutter-zed-extension/task-18-spaced-path.txt
+Restoration purpose: place prior verified evidence at the plan-required path; no new live validation is claimed.
+
+Command:
+python3 -m unittest tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_unicode_spaced_path_preserves_root_args_and_environment -v
+
+Result: PASS
+
+The test renames its temporary Flutter fixture to "unicodé fixture app", then verifies detection, FVM fake-SDK probing, setup writes, and generated task execution. The fake executable receives the exact Unicode/space-containing executable and cwd paths plus the original argv entries; hostile BASH_ENV, ENV, and CDPATH values are removed before direct child execution.
+
+No host Flutter, device, network, default tmux server, or user resource is used.

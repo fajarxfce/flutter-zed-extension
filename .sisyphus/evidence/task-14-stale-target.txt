@@ -1,0 +1,13 @@
+Command:
+python3 -m unittest tests.test_tmux_runner.TmuxRunnerTests.test_hot_restart_refuses_stale_state_without_sending_input -v
+
+Result:
+test_hot_restart_refuses_stale_state_without_sending_input (tests.test_tmux_runner.TmuxRunnerTests.test_hot_restart_refuses_stale_state_without_sending_input) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.306s
+
+OK
+
+Evidence:
+The test creates only a unique disposable tmux -L socket, starts a verified owned runner, corrupts the persisted process-start-time marker, and captures pane content before and after restart. Restart raises tmux.failed with stale-mismatched status and the pane capture remains exactly unchanged, proving send-keys was not invoked.

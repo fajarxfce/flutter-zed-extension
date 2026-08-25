@@ -1,0 +1,14 @@
+Task 11 — unexpected process failure cleanup
+
+Command:
+python3 -m unittest tests.test_diagnostics.DiagnosticTests.test_modeled_boundary_failures_have_stable_codes -v
+
+Output:
+test_modeled_boundary_failures_have_stable_codes (tests.test_diagnostics.DiagnosticTests.test_modeled_boundary_failures_have_stable_codes) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in <deterministic fake-fixture runtime>
+
+OK
+
+Assertion: a modeled unexpected `flutter run` termination produces deterministic code `process.unexpected_failure`, retains command context, identifies `RuntimeError`, and records `cleanup_completed=True`. This is a data-only model; no process, Flutter, DAP, tmux, or shell is started.

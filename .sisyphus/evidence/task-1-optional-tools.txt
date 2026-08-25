@@ -1,0 +1,36 @@
+Task 1 — Platform tool availability (restored evidence)
+
+Source evidence: /home/fajar/.sisyphus/evidence/task-1-optional-tools.txt
+Original observation timestamp: 2026-08-25T17:53:53+07:00
+Restoration purpose: place the prior non-mutating tool check at the plan-required product-relative path. This file does not claim a new or live validation.
+
+Original command
+for tool in flutter dart fvm tmux zed cargo rustc node npm pnpm bun; do printf '%s: ' "$tool"; command -v "$tool" || true; done
+
+Original observed paths and result
+- flutter: /home/fajar/flutter/bin/flutter
+- dart: /home/fajar/flutter/bin/dart
+- fvm: absent from PATH
+- tmux: /usr/sbin/tmux
+- zed: absent from PATH
+- cargo: /usr/sbin/cargo
+- rustc: /usr/sbin/rustc
+- node: /home/fajar/.nvm/versions/node/v24.15.0/bin/node
+- npm: /home/fajar/.nvm/versions/node/v24.15.0/bin/npm
+- pnpm: absent from PATH
+- bun: /home/fajar/.bun/bin/bun
+- Command exit: 0.
+
+Original version-command summaries
+- flutter --version: exit 0; Flutter 3.44.4 stable, Framework ad70ec4617, Dart 3.12.2, Linux host.
+- dart --version: exit 0; Dart SDK 3.12.2 stable on linux_x64.
+- fvm --version: exit 127; zsh: command not found: fvm.
+- tmux -V: exit 0; tmux 3.7c.
+- zed --version: exit 127; zsh: command not found: zed.
+- cargo --version: exit 0; cargo 1.95.0 (f2d3ce0bd 2026-03-21).
+- rustc --version: exit 0; rustc 1.95.0 (59807616e 2026-04-14).
+- node --version: exit 0; v24.15.0.
+- npm --version: exit 0; 11.12.1.
+
+Original classification
+Flutter/Dart and Rust/Cargo were available; FVM was optional and absent; tmux was optional and available; Zed CLI was unavailable on PATH, so live local installation/loading validation was blocked. The base extension must not require FVM or tmux; tmux use must remain opt-in with an explicit configured target.

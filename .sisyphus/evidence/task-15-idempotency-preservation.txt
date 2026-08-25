@@ -1,0 +1,13 @@
+Command:
+python3 -m unittest tests.test_project_setup.ProjectSetupTests.test_dry_run_merges_owned_entries_and_repeat_is_idempotent -v
+
+Result:
+test_dry_run_merges_owned_entries_and_repeat_is_idempotent (tests.test_project_setup.ProjectSetupTests.test_dry_run_merges_owned_entries_and_repeat_is_idempotent) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.005s
+
+OK
+
+Evidence:
+The test begins with unrelated `.zed/tasks.json` top-level settings and user task/debug entries, plus stale owned labels. Dry-run produces a unified diff without writes. Setup retains unrelated settings and entries, replaces each owned entry exactly once, writes both generated files mode 0600, and repeat normal/dry runs report no change and an empty diff.

@@ -1,0 +1,1 @@
+configuration validation failed: tmux: requires explicit session, window, and pane

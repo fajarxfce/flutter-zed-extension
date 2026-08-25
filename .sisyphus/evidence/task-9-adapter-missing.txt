@@ -1,0 +1,16 @@
+Task 9 — adapter unavailable without tmux fallback
+
+Command:
+python3 -m unittest tests.test_dap_templates.DebugConfigurationTests.test_missing_adapter_is_actionable_and_never_falls_back_to_tmux -v
+
+Output:
+test_missing_adapter_is_actionable_and_never_falls_back_to_tmux (tests.test_dap_templates.DebugConfigurationTests.test_missing_adapter_is_actionable_and_never_falls_back_to_tmux) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.01s
+
+OK
+
+Assertions: an absent explicit adapter raises `DapAdapterError` with diagnostic code `dap.failed`, says the adapter is unavailable and advises enabling/installing the Dart Zed extension. The diagnostic has no command and does not mention tmux.
+
+Result: failure is actionable and no tmux interaction or fallback is available.

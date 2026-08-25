@@ -1,0 +1,9 @@
+Task 6 Dart-only detection evidence
+
+Command:
+python3 -c 'from pathlib import Path; from scripts.project_detection import detect_project; d = detect_project(Path("tests/fixtures/dart_package/lib")); print(f"kind={d.kind} root={d.project_root.relative_to(Path.cwd())} run_config={d.has_run_configuration} diagnostics={d.diagnostics}")'
+
+Output:
+kind=dart_package root=tests/fixtures/dart_package run_config=False diagnostics=()
+
+Result: a material Dart package is classified separately and deterministically produces no Flutter run configuration.

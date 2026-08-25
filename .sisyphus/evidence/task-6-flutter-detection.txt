@@ -1,0 +1,9 @@
+Task 6 Flutter detection evidence
+
+Command:
+python3 -c 'from pathlib import Path; from scripts.project_detection import detect_project; d = detect_project(Path("tests/fixtures/fvm_app/lib")); print(f"kind={d.kind} root={d.project_root.relative_to(Path.cwd())} workspace_root={d.workspace_root} fvm={d.has_fvm_metadata} zed={d.has_zed_metadata} run_config={d.has_run_configuration}")'
+
+Output:
+kind=flutter_app root=tests/fixtures/fvm_app workspace_root=None fvm=True zed=False run_config=True
+
+Result: nested invocation canonically resolves the Flutter app root, records optional FVM metadata, and permits a Flutter run configuration without executing Flutter or FVM.

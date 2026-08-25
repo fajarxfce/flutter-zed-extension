@@ -1,0 +1,21 @@
+Task 16 deterministic boundary failure evidence
+Command: python3 -m unittest tests.test_workflow_orchestration -v
+
+Test output:
+test_boundary_failures_are_stable_and_leave_unsafe_inputs_untouched (tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_boundary_failures_are_stable_and_leave_unsafe_inputs_untouched) ... ok
+test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs (tests.test_workflow_orchestration.WorkflowOrchestrationTests.test_complete_offline_workflow_records_generated_artifacts_and_fixed_tmux_inputs) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.753s
+
+OK
+
+Verified boundary mapping and safety:
+- detection: an empty temporary directory yields project.invalid; no .zed directory is created;
+- SDK: removing the temporary fake FVM SDK yields sdk.missing; no host SDK or network fallback is used;
+- generated task: fake Flutter test failure is converted to process.failed and preserves the exact generated task argv;
+- DAP: a missing fake adapter yields dap.failed without a tmux fallback;
+- tmux foreign state: status_runner reports foreign-no-owned-runner and a reload attempt yields tmux.failed;
+- tmux stale state: tampered owned-runner start identity yields tmux.failed, and capture-pane before/after confirms no reload/restart input was sent.
+
+All tmux commands use a unique disposable -L server and cleanup kills only that server.

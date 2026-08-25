@@ -1,0 +1,24 @@
+Task 21 — proposal scope/non-goals audit
+Generated: 2026-08-25
+Audited file: UPSTREAM_ZED_API_PROPOSAL.md
+
+REQUIRED BOUNDARIES CHECKED
+
+[PASS] Proposal status states that no described API is accepted, implemented, or required by current Zed releases.
+[PASS] Requested surface is explicitly minimal: commands/keybindings, owned scoped process/stdin, lifecycle notifications, bounded status/selector UI.
+[PASS] Existing product remains separately described as manifest LSP/snippets, generated task/debug configuration, and optional external tmux bridge.
+[PASS] No implementation source, manifest, runtime integration, Zed core, dependency, installation, or publishing change is requested or made.
+[PASS] No full VS Code parity is promised.
+[PASS] No arbitrary terminal selection/control, terminal scraping, arbitrary stdin, key injection, shell form, process discovery, PID signaling, or tmux control is proposed.
+[PASS] stdin is constrained to an extension-owned opaque process handle and permission-reviewed fixed declared tokens.
+[PASS] Process execution is separately capability-gated by command/argv/workspace scope; no implicit shell or denied-operation fallback is permitted.
+[PASS] Lifecycle hooks are notify-only by default; save-triggered process execution needs an additional, disabled-by-default, visible automation grant with trigger/allowlist/cwd/rate limit.
+[PASS] UI is a bounded status item/selector; arbitrary webviews, dock panels, and editor-wide device management are excluded.
+[PASS] Migration preserves declarative Zed tasks/debug configuration and treats new APIs as optional/versioned.
+[PASS] tmux is an alternative/compatibility path only and is not presented as native Zed terminal control.
+[PASS] Security/non-destructive requirements match local evidence: explicit scope, ownership verification, fixed hot inputs, foreign/stale refusal, argv-only execution, and user configuration preservation.
+
+NEGATIVE TERM SCAN
+The proposal uses “not”, “rejected”, “denied”, “non-goals”, “proposal only”, and “illustrative” to delimit scope. It contains no assertion that the proposed command, stdin, lifecycle, or UI APIs currently exist. It contains no instruction to modify Zed core or bind this product's runtime to a future API.
+
+RESULT: PASS — no unsupported implementation promise found.

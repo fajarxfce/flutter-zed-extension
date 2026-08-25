@@ -1,0 +1,9 @@
+Command:
+python3 -m unittest tests.test_tmux_runner.TmuxRunnerTests.test_start_refuses_foreign_process_without_changing_it tests.test_tmux_runner.TmuxRunnerTests.test_stop_refuses_foreign_process_without_changing_it -v
+
+Result:
+test_start_refuses_foreign_process_without_changing_it ... ok
+test_stop_refuses_foreign_process_without_changing_it ... ok
+
+Audit:
+Both probes use a unique tmux -L socket. Start now refuses a pane whose current command is foreign rather than an idle shell; stop refuses when no owned state/token exists. Neither probe writes state/log data nor changes foreign pane content/processes.

@@ -1,0 +1,10 @@
+Command:
+python3 -m unittest tests.test_tmux_runner.TmuxRunnerTests.test_start_status_log_identity_and_stop_owned_runner -v
+
+Result:
+test_start_status_log_identity_and_stop_owned_runner (tests.test_tmux_runner.TmuxRunnerTests.test_start_status_log_identity_and_stop_owned_runner) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.406s
+
+OK

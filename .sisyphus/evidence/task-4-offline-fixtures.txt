@@ -1,0 +1,19 @@
+test_ambiguous_tmux_target_fails_without_invoking_tmux (test_configuration.ConfigurationValidationTests.test_ambiguous_tmux_target_fails_without_invoking_tmux) ... ok
+test_invalid_path_mode_and_selector_report_their_fields (test_configuration.ConfigurationValidationTests.test_invalid_path_mode_and_selector_report_their_fields) ... ok
+test_valid_fvm_configuration_preserves_explicit_values (test_configuration.ConfigurationValidationTests.test_valid_fvm_configuration_preserves_explicit_values) ... ok
+test_fake_dart_returns_configured_failure (test_fixtures.OfflineFixtureTests.test_fake_dart_returns_configured_failure) ... ok
+test_fake_flutter_logs_target_flavor_and_device_arguments (test_fixtures.OfflineFixtureTests.test_fake_flutter_logs_target_flavor_and_device_arguments) ... ok
+test_fake_flutter_reports_missing_device (test_fixtures.OfflineFixtureTests.test_fake_flutter_reports_missing_device) ... ok
+test_fvm_fixture_has_explicit_metadata (test_fixtures.OfflineFixtureTests.test_fvm_fixture_has_explicit_metadata) ... ok
+test_invalid_and_malformed_fixtures_classify_as_invalid (test_fixtures.OfflineFixtureTests.test_invalid_and_malformed_fixtures_classify_as_invalid) ... ok
+test_malformed_fixture_configuration_is_rejected (test_fixtures.OfflineFixtureTests.test_malformed_fixture_configuration_is_rejected) ... ok
+test_valid_fixture_projects_classify_as_flutter_apps (test_fixtures.OfflineFixtureTests.test_valid_fixture_projects_classify_as_flutter_apps) ... ok
+test_real_sdk_integration_is_explicitly_separate (test_fixtures.RealSdkIntegrationTests.test_real_sdk_integration_is_explicitly_separate) ... ok
+test_canonical_manifest_is_valid_without_tmux_or_fvm (test_manifest.ManifestValidationTests.test_canonical_manifest_is_valid_without_tmux_or_fvm) ... ok
+test_manifest_does_not_require_optional_tools (test_manifest.ManifestValidationTests.test_manifest_does_not_require_optional_tools) ... ok
+test_missing_required_field_fails_clearly (test_manifest.ManifestValidationTests.test_missing_required_field_fails_clearly) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.281s
+
+OK
