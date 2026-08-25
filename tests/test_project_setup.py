@@ -59,6 +59,55 @@ class ProjectSetupTests(unittest.TestCase):
         self.assertEqual(stat.S_IMODE(tasks.stat().st_mode), 0o600)
         self.assertEqual(stat.S_IMODE(debug.stat().st_mode), 0o600)
 
+    def test_jsonc_debug_config_preserves_user_entries_and_comment_like_strings(self) -> None:
+        zed = self.root / ".zed"
+        zed.mkdir()
+        debug = zed / "debug.json"
+        debug.write_text(
+            "// Project-local debug tasks\n"
+            "[\n"
+            "  {\n"
+            '    "label": "Flutter: Dev", // retain this user entry\n'
+            '    "adapter": "Dart",\n'
+            '    "program": "lib/main.dart",\n'
+            '    "url": "https://example.test/path//not-a-comment"\n'
+            "  },\n"
+            "  /* production configuration */\n"
+            "  {\n"
+            '    "label": "Flutter: Prod",\n'
+            '    "adapter": "Dart",\n'
+            '    "program": "lib/main_prod.dart"\n'
+            "  }\n"
+            "]\n",
+            encoding="utf-8",
+        )
+
+        result = setup_project(self.configuration, self.sdk)
+
+        self.assertTrue(result.changed)
+        debug_document = json.loads(debug.read_text(encoding="utf-8"))
+        self.assertEqual(debug_document[0]["label"], "Flutter: Dev")
+        self.assertEqual(debug_document[0]["url"], "https://example.test/path//not-a-comment")
+        self.assertEqual(debug_document[1]["label"], "Flutter: Prod")
+        self.assertEqual(sum(entry["label"] == "Flutter: Launch" for entry in debug_document), 1)
+
+    def test_malformed_jsonc_is_never_overwritten_or_partially_written(self) -> None:
+        zed = self.root / ".zed"
+        zed.mkdir()
+        tasks = zed / "tasks.json"
+        debug = zed / "debug.json"
+        tasks.write_text('{"tasks": []}', encoding="utf-8")
+        debug.write_text('[{"label": "User debug"} /* unclosed', encoding="utf-8")
+        tasks_before = tasks.read_bytes()
+        debug_before = debug.read_bytes()
+
+        with self.assertRaises(ProjectSetupError) as raised:
+            setup_project(self.configuration, self.sdk)
+
+        self.assertEqual(raised.exception.diagnostic.code, "configuration.invalid")
+        self.assertEqual(tasks.read_bytes(), tasks_before)
+        self.assertEqual(debug.read_bytes(), debug_before)
+
     def test_malformed_config_is_never_overwritten_or_partially_written(self) -> None:
         zed = self.root / ".zed"
         zed.mkdir()

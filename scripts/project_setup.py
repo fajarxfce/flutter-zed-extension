@@ -44,11 +44,54 @@ class SetupResult:
     dry_run: bool
 
 
+def _strip_jsonc_comments(contents: str) -> str:
+    output: list[str] = []
+    quote = False
+    escaped = False
+    index = 0
+    while index < len(contents):
+        character = contents[index]
+        following = contents[index + 1] if index + 1 < len(contents) else ""
+        if quote:
+            output.append(character)
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                quote = False
+            index += 1
+            continue
+        if character == '"':
+            quote = True
+            output.append(character)
+            index += 1
+        elif character == "/" and following == "/":
+            index += 2
+            while index < len(contents) and contents[index] not in "\r\n":
+                index += 1
+        elif character == "/" and following == "*":
+            index += 2
+            while index + 1 < len(contents) and contents[index : index + 2] != "*/":
+                if contents[index] in "\r\n":
+                    output.append(contents[index])
+                index += 1
+            if index + 1 >= len(contents):
+                raise json.JSONDecodeError("Unterminated JSONC block comment", contents, index)
+            index += 2
+        else:
+            output.append(character)
+            index += 1
+    if quote:
+        raise json.JSONDecodeError("Unterminated JSON string", contents, len(contents))
+    return "".join(output)
+
+
 def _read_json(path: Path, expected: type[object], empty: object) -> object:
     if not path.exists():
         return empty
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        value = json.loads(_strip_jsonc_comments(path.read_text(encoding="utf-8")))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise ProjectSetupError(
             f"Cannot safely update malformed Zed configuration: {path}: {error}",

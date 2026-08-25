@@ -56,8 +56,20 @@ class ProjectDetectionTests(unittest.TestCase):
         self.assertEqual(detected.workspace_root, workspace)
 
     def test_workspace_list_followed_by_top_level_key_remains_a_list(self) -> None:
-        pubspec = "name: workspace\nworkspace:\n  - packages/app\nenvironment:\n  sdk: \">=3.0.0 <4.0.0\"\n"
-        self.assertEqual(parse_pubspec(pubspec)["workspace"], ["packages/app"])
+        pubspec = (
+            "name: workspace\n"
+            "workspace:\n"
+            "  - packages/navigation\n"
+            "  - packages/core/common\n"
+            "environment:\n"
+            "  sdk: \">=3.8.0 <4.0.0\"\n"
+            "dependencies:\n"
+            "  flutter:\n"
+            "    sdk: flutter\n"
+        )
+        parsed = parse_pubspec(pubspec)
+        self.assertEqual(parsed["workspace"], ["packages/navigation", "packages/core/common"])
+        self.assertEqual(parsed["environment"], {"sdk": ">=3.8.0 <4.0.0"})
 
     def test_inline_comments_are_removed_without_changing_quoted_hashes(self) -> None:
         pubspec = 'name: app\npublish_to: "none" # hris uses a private package\ndescription: "Preserve # inside quotes"\n'

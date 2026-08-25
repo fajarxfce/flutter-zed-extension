@@ -98,7 +98,6 @@ def parse_pubspec(contents: str) -> dict[str, YamlValue]:
                 raise PubspecError(f"line {line_number}: mixed mapping and list values")
             existing.append(_scalar(_strip_inline_comment(text[2:]).strip(), line_number))
             stack = [(stack_indent, mapping) for stack_indent, mapping in stack if stack_indent < indent]
-            pending = None
             continue
         if ":" not in text:
             raise PubspecError(f"line {line_number}: expected key: value")

@@ -14,6 +14,8 @@ It is **not** a published workflow, a VS Code-compatibility layer, or a native Z
 * The tmux bridge is optional and disabled unless the configuration includes every explicit target component. Its owned-runner lifecycle and fixed `r`/`R` operations are verified on Linux only because ownership verification uses `/proc`; macOS and WSL users must validate their local `/proc` semantics and tmux server before relying on lifecycle control. An interrupt sends `SIGINT` only to the token- and PID-verified owned runner; it never kills or recreates the configured pane, window, session, or tmux server.
 * Windows-native core configuration generation can work with a compatible Python and Flutter SDK, but the tmux bridge is not supported or tested in native Windows. Use the bridge only through a tested WSL or Git-Bash tmux environment with the bridge, project, and target pane in that same environment; native Zed terminal control is not provided.
 
+Existing `.zed/tasks.json` and `.zed/debug.json` files are read before generated entries are merged. Debug configuration accepts JSONC `//` and `/* ... */` comments outside JSON strings, then serializes the merged result as standard JSON; comments are therefore not retained after a write. Malformed JSON or JSONC is never overwritten.
+
 Run the complete deterministic verification surface from the repository root:
 
 ```sh
