@@ -87,7 +87,7 @@ def _strip_jsonc_comments(contents: str) -> str:
     return "".join(output)
 
 
-def _read_json(path: Path, expected: type[object], empty: object) -> object:
+def _read_json(path: Path, expected: type[object] | tuple[type[object], ...], empty: object) -> object:
     if not path.exists():
         return empty
     try:
@@ -111,16 +111,22 @@ def _merge_labeled_entries(existing: list[Any], generated: list[dict[str, object
     return [*retained, *generated]
 
 
-def _tasks_document(existing: dict[str, Any], generated: list[dict[str, object]]) -> dict[str, Any]:
-    tasks = existing.get("tasks", [])
-    if not isinstance(tasks, list):
-        raise ProjectSetupError(
-            "Cannot safely update Zed tasks with non-list 'tasks' field.",
-            invalid_configuration("Existing .zed/tasks.json has a non-list 'tasks' field; it was not overwritten."),
-        )
-    merged = dict(existing)
-    merged["tasks"] = _merge_labeled_entries(tasks, generated)
-    return merged
+def _tasks_document(existing: list[Any] | dict[str, Any], generated: list[dict[str, object]]) -> list[Any]:
+    if isinstance(existing, list):
+        return _merge_labeled_entries(existing, generated)
+    tasks = existing.get("tasks")
+    generated_labels = {entry["label"] for entry in generated}
+    is_legacy_generated = (
+        set(existing) == {"tasks"}
+        and isinstance(tasks, list)
+        and all(isinstance(entry, dict) and entry.get("label") in generated_labels for entry in tasks)
+    )
+    if is_legacy_generated:
+        return _merge_labeled_entries(tasks, generated)
+    raise ProjectSetupError(
+        "Cannot safely migrate unsupported Zed tasks document.",
+        invalid_configuration("Existing .zed/tasks.json is not an array or a recognized legacy generated wrapper; it was not overwritten."),
+    )
 
 
 def _render(document: object) -> str:
@@ -170,9 +176,9 @@ def setup_project(configuration: FlutterConfiguration, sdk: ResolvedSdk, *, dry_
     debug_path = root / ".zed" / "debug.json"
     tasks_before = tasks_path.read_text(encoding="utf-8") if tasks_path.exists() else ""
     debug_before = debug_path.read_text(encoding="utf-8") if debug_path.exists() else ""
-    existing_tasks = _read_json(tasks_path, dict, {})
+    existing_tasks = _read_json(tasks_path, (list, dict), [])
     existing_debug = _read_json(debug_path, list, [])
-    generated_tasks = generate_task_templates(configuration, sdk).as_json()["tasks"]
+    generated_tasks = generate_task_templates(configuration, sdk).as_json()
     generated_debug = generate_debug_configurations(configuration, sdk).as_json()
     tasks_after = _render(_tasks_document(existing_tasks, generated_tasks))
     debug_after = _render(_merge_labeled_entries(existing_debug, generated_debug))

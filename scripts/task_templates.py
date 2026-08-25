@@ -46,8 +46,9 @@ class TaskTemplates:
 
     tasks: tuple[TaskTemplate, ...]
 
-    def as_json(self) -> dict[str, object]:
-        return {"tasks": [task.as_json() for task in self.tasks]}
+    def as_json(self) -> list[dict[str, object]]:
+        """Return the array-root document required by Zed's ``.zed/tasks.json``."""
+        return [task.as_json() for task in self.tasks]
 
     def to_json(self) -> str:
         return json.dumps(self.as_json(), indent=2) + "\n"

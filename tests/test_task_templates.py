@@ -57,8 +57,9 @@ class TaskTemplateTests(unittest.TestCase):
     def test_templates_emit_zed_json_with_stable_labels_and_argv(self) -> None:
         templates = generate_task_templates(self.configuration, self.sdk)
         document = json.loads(templates.to_json())
+        self.assertIsInstance(document, list)
         self.assertEqual(
-            [task["label"] for task in document["tasks"]],
+            [task["label"] for task in document],
             [
                 "Flutter: Pub get",
                 "Flutter: Analyze",
@@ -87,7 +88,7 @@ class TaskTemplateTests(unittest.TestCase):
             ),
         )
         self.assertEqual(run.cwd, self.root)
-        self.assertEqual(document["tasks"][6]["command"], str(self.fake_flutter.resolve()))
+        self.assertEqual(document[6]["command"], str(self.fake_flutter.resolve()))
 
     def test_optional_selectors_only_emit_relevant_flags(self) -> None:
         configuration = FlutterConfiguration(

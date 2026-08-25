@@ -36,7 +36,7 @@ class ProjectSetupTests(unittest.TestCase):
         zed.mkdir()
         tasks = zed / "tasks.json"
         debug = zed / "debug.json"
-        tasks.write_text('{\n  "custom": {"keep": true},\n  "tasks": [{"label": "User task", "command": "true"}, {"label": "Flutter: Test", "old": true}]\n}\n', encoding="utf-8")
+        tasks.write_text('[{"label": "User task", "command": "true"}, {"label": "Flutter: Test", "old": true}]\n', encoding="utf-8")
         debug.write_text('[{"label": "User debug", "adapter": "Other"}, {"label": "Flutter: Launch", "old": true}]\n', encoding="utf-8")
 
         dry_result = setup_project(self.configuration, self.sdk, dry_run=True)
@@ -49,15 +49,39 @@ class ProjectSetupTests(unittest.TestCase):
         self.assertTrue(result.changed)
         task_document = json.loads(tasks.read_text(encoding="utf-8"))
         debug_document = json.loads(debug.read_text(encoding="utf-8"))
-        self.assertEqual(task_document["custom"], {"keep": True})
-        self.assertEqual(task_document["tasks"][0], {"label": "User task", "command": "true"})
+        self.assertIsInstance(task_document, list)
+        self.assertEqual(task_document[0], {"label": "User task", "command": "true"})
         self.assertEqual(debug_document[0], {"label": "User debug", "adapter": "Other"})
-        self.assertEqual(sum(task["label"] == "Flutter: Test" for task in task_document["tasks"]), 1)
+        self.assertEqual(sum(task["label"] == "Flutter: Test" for task in task_document), 1)
         self.assertEqual(sum(entry["label"] == "Flutter: Launch" for entry in debug_document), 1)
         self.assertEqual(setup_project(self.configuration, self.sdk).changed, False)
         self.assertEqual(setup_project(self.configuration, self.sdk, dry_run=True).diff, "")
         self.assertEqual(stat.S_IMODE(tasks.stat().st_mode), 0o600)
         self.assertEqual(stat.S_IMODE(debug.stat().st_mode), 0o600)
+
+    def test_legacy_generated_tasks_wrapper_is_migrated_to_zed_array_root(self) -> None:
+        tasks = self.root / ".zed" / "tasks.json"
+        tasks.parent.mkdir()
+        tasks.write_text('{"tasks": [{"label": "Flutter: Test", "old": true}]}\n', encoding="utf-8")
+
+        result = setup_project(self.configuration, self.sdk)
+
+        self.assertTrue(result.changed)
+        document = json.loads(tasks.read_text(encoding="utf-8"))
+        self.assertIsInstance(document, list)
+        self.assertEqual(sum(task["label"] == "Flutter: Test" for task in document), 1)
+
+    def test_unrecognized_tasks_wrapper_is_never_overwritten(self) -> None:
+        tasks = self.root / ".zed" / "tasks.json"
+        tasks.parent.mkdir()
+        tasks.write_text('{"tasks": [{"label": "User task", "command": "true"}]}\n', encoding="utf-8")
+        before = tasks.read_bytes()
+
+        with self.assertRaises(ProjectSetupError) as raised:
+            setup_project(self.configuration, self.sdk)
+
+        self.assertEqual(raised.exception.diagnostic.code, "configuration.invalid")
+        self.assertEqual(tasks.read_bytes(), before)
 
     def test_jsonc_debug_config_preserves_user_entries_and_comment_like_strings(self) -> None:
         zed = self.root / ".zed"
