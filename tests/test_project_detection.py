@@ -59,6 +59,12 @@ class ProjectDetectionTests(unittest.TestCase):
         pubspec = "name: workspace\nworkspace:\n  - packages/app\nenvironment:\n  sdk: \">=3.0.0 <4.0.0\"\n"
         self.assertEqual(parse_pubspec(pubspec)["workspace"], ["packages/app"])
 
+    def test_inline_comments_are_removed_without_changing_quoted_hashes(self) -> None:
+        pubspec = 'name: app\npublish_to: "none" # hris uses a private package\ndescription: "Preserve # inside quotes"\n'
+        parsed = parse_pubspec(pubspec)
+        self.assertEqual(parsed["publish_to"], "none")
+        self.assertEqual(parsed["description"], "Preserve # inside quotes")
+
     def test_nested_pubspec_wins_over_ancestor_workspace(self) -> None:
         with tempfile.TemporaryDirectory(dir=ROOT) as temporary_directory:
             workspace = Path(temporary_directory)

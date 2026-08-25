@@ -36,10 +36,31 @@ class PubspecError(ValueError):
     """Raised for pubspec YAML outside the deliberately supported subset."""
 
 
+def _strip_inline_comment(text: str) -> str:
+    quote: str | None = None
+    index = 0
+    while index < len(text):
+        character = text[index]
+        if quote is None:
+            if character in {"'", '"'}:
+                quote = character
+            elif character == "#" and index > 0 and text[index - 1].isspace():
+                return text[:index].rstrip()
+        elif character == quote:
+            if quote == "'" and index + 1 < len(text) and text[index + 1] == "'":
+                index += 1
+            elif quote == '"' and index > 0 and text[index - 1] == "\\":
+                pass
+            else:
+                quote = None
+        index += 1
+    return text
+
+
 def _scalar(value: str, line_number: int) -> str:
     if not value or value.startswith(("[", "{", "&", "*", "|", ">")):
         raise PubspecError(f"line {line_number}: unsupported YAML value")
-    if " #" in value or "\t" in value:
+    if "\t" in value:
         raise PubspecError(f"line {line_number}: unsupported YAML syntax")
     if value[0:1] in {"'", '"'}:
         if len(value) < 2 or value[-1] != value[0]:
@@ -75,7 +96,7 @@ def parse_pubspec(contents: str) -> dict[str, YamlValue]:
                 parent[key] = existing
             if not isinstance(existing, list):
                 raise PubspecError(f"line {line_number}: mixed mapping and list values")
-            existing.append(_scalar(text[2:].strip(), line_number))
+            existing.append(_scalar(_strip_inline_comment(text[2:]).strip(), line_number))
             stack = [(stack_indent, mapping) for stack_indent, mapping in stack if stack_indent < indent]
             pending = None
             continue
@@ -85,7 +106,7 @@ def parse_pubspec(contents: str) -> dict[str, YamlValue]:
         key = key.strip()
         if not key or key.startswith(("-", "?", "&", "*")):
             raise PubspecError(f"line {line_number}: unsupported YAML key")
-        value = value.strip()
+        value = _strip_inline_comment(value).strip()
         parent = stack[-1][1]
         if key in parent:
             raise PubspecError(f"line {line_number}: duplicate key {key!r}")
