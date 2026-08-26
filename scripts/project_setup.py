@@ -159,7 +159,7 @@ def _atomic_write(path: Path, contents: str) -> None:
 
 
 def setup_project(configuration: FlutterConfiguration, sdk: ResolvedSdk, *, dry_run: bool = False) -> SetupResult:
-    """Merge generated Flutter entries into a detected Flutter app's `.zed` files.
+    """Merge generated Flutter entries into the opened worktree's `.zed` files.
 
     Both existing files are parsed before either write, so malformed metadata
     cannot cause a partial overwrite.  A dry run only returns a stable unified
@@ -171,9 +171,9 @@ def setup_project(configuration: FlutterConfiguration, sdk: ResolvedSdk, *, dry_
             f"Refusing to create Zed files outside a detected Flutter application: {configuration.project_root}",
             invalid_project("Project setup requires a detected Flutter application.", project_root=str(configuration.project_root)),
         )
-    root = configuration.project_root.resolve()
-    tasks_path = root / ".zed" / "tasks.json"
-    debug_path = root / ".zed" / "debug.json"
+    worktree_root = configuration.worktree_root.resolve()
+    tasks_path = worktree_root / ".zed" / "tasks.json"
+    debug_path = worktree_root / ".zed" / "debug.json"
     tasks_before = tasks_path.read_text(encoding="utf-8") if tasks_path.exists() else ""
     debug_before = debug_path.read_text(encoding="utf-8") if debug_path.exists() else ""
     existing_tasks = _read_json(tasks_path, (list, dict), [])

@@ -26,7 +26,7 @@ class ProjectSetupTests(unittest.TestCase):
         executable.chmod(executable.stat().st_mode | stat.S_IXUSR)
         version = ExecutableVersion(executable, "", "")
         self.sdk = ResolvedSdk("explicit", self.directory, version, version)
-        self.configuration = FlutterConfiguration(self.root, "flutter", None, None, None, "debug", (), None, None)
+        self.configuration = FlutterConfiguration(self.root, self.root, "flutter", None, None, None, "debug", (), None, None)
 
     def tearDown(self) -> None:
         self.temporary_directory.cleanup()
@@ -58,6 +58,34 @@ class ProjectSetupTests(unittest.TestCase):
         self.assertEqual(setup_project(self.configuration, self.sdk, dry_run=True).diff, "")
         self.assertEqual(stat.S_IMODE(tasks.stat().st_mode), 0o600)
         self.assertEqual(stat.S_IMODE(debug.stat().st_mode), 0o600)
+
+    def test_nested_worktree_writes_root_metadata_and_preserves_user_entries(self) -> None:
+        worktree = self.directory / "monorepo"
+        worktree.mkdir()
+        nested = worktree / "app"
+        self.root.rename(nested)
+        self.root = nested
+        self.configuration = FlutterConfiguration(self.root, worktree, "flutter", self.root / "lib" / "main.dart", None, "prod", "debug", (), None, None)
+        zed = worktree / ".zed"
+        zed.mkdir()
+        tasks = zed / "tasks.json"
+        debug = zed / "debug.json"
+        tasks.write_text('[{"label": "User task", "command": "true"}]\n', encoding="utf-8")
+        debug.write_text('[{"label": "User debug", "adapter": "Other"}]\n', encoding="utf-8")
+
+        result = setup_project(self.configuration, self.sdk)
+
+        task_document = json.loads(tasks.read_text(encoding="utf-8"))
+        debug_document = json.loads(debug.read_text(encoding="utf-8"))
+        run = next(task for task in task_document if task["label"] == "Flutter: Run")
+        self.assertEqual(result.tasks_path, tasks)
+        self.assertEqual(result.debug_path, debug)
+        self.assertEqual(run["cwd"], "$ZED_WORKTREE_ROOT/app")
+        self.assertEqual(run["args"], ["run", "--target", "lib/main.dart", "--flavor", "prod", "--debug"])
+        self.assertEqual(debug_document[-1]["cwd"], "$ZED_WORKTREE_ROOT/app")
+        self.assertFalse((self.root / ".zed").exists())
+        self.assertFalse(any(str(self.directory) in json.dumps(document) for document in (task_document, debug_document)))
+        self.assertFalse(setup_project(self.configuration, self.sdk).changed)
 
     def test_legacy_generated_tasks_wrapper_is_migrated_to_zed_array_root(self) -> None:
         tasks = self.root / ".zed" / "tasks.json"
