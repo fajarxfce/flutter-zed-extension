@@ -19,7 +19,7 @@ from scripts.configuration import FlutterConfiguration
 from scripts.diagnostics import Diagnostic, dap_failure
 from scripts.runtime import safe_environment
 from scripts.sdk_resolution import ResolvedSdk
-from scripts.task_templates import ZED_WORKTREE_ROOT
+from scripts.task_templates import zed_cwd
 
 DART_ADAPTER = "Dart"
 FLUTTER_TYPE = "flutter"
@@ -136,7 +136,7 @@ def generate_debug_configurations(configuration: FlutterConfiguration, sdk: Reso
             request="launch",
             type=FLUTTER_TYPE,
             program=program,
-            cwd=ZED_WORKTREE_ROOT,
+            cwd=zed_cwd(configuration),
             flutter_mode=configuration.mode,
             device_id=configuration.device,
             tool_args=_launch_tool_args(configuration),
@@ -152,7 +152,7 @@ def generate_debug_configurations(configuration: FlutterConfiguration, sdk: Reso
         request="attach",
         type=FLUTTER_TYPE,
         program=program,
-        cwd=ZED_WORKTREE_ROOT,
+        cwd=zed_cwd(configuration),
         vm_service_uri=attach_uri,
     )
     return DebugConfigurations((attach,))

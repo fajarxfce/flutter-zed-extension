@@ -32,6 +32,7 @@ class DebugConfigurationTests(unittest.TestCase):
         self.fake_adapter.chmod(self.fake_adapter.stat().st_mode | stat.S_IXUSR)
         self.configuration = FlutterConfiguration(
             project_root=self.root,
+            worktree_root=self.root,
             sdk_mode="fvm",
             target=self.target,
             device="emulator-5554",
@@ -51,6 +52,7 @@ class DebugConfigurationTests(unittest.TestCase):
         launch = generate_debug_configurations(self.configuration, self.sdk).configurations[0]
         attach_configuration = FlutterConfiguration(
             project_root=self.root,
+            worktree_root=self.root,
             sdk_mode="fvm",
             target=self.target,
             device="emulator-5554",
@@ -117,6 +119,7 @@ class DebugConfigurationTests(unittest.TestCase):
     def test_attach_requires_uri_from_dap_settings(self) -> None:
         configuration = FlutterConfiguration(
             project_root=self.root,
+            worktree_root=self.root,
             sdk_mode="flutter",
             target=None,
             device=None,

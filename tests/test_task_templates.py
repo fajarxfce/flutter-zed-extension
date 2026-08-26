@@ -32,6 +32,7 @@ class TaskTemplateTests(unittest.TestCase):
         self.fake_flutter.chmod(self.fake_flutter.stat().st_mode | stat.S_IXUSR)
         self.configuration = FlutterConfiguration(
             project_root=self.root,
+            worktree_root=self.root,
             sdk_mode="fvm",
             target=self.root / "lib" / "main_staging.dart",
             device="fake-device",
@@ -97,6 +98,7 @@ class TaskTemplateTests(unittest.TestCase):
     def test_system_serialization_uses_path_commands_and_relative_target(self) -> None:
         configuration = FlutterConfiguration(
             project_root=self.root,
+            worktree_root=self.root,
             sdk_mode="flutter",
             target=self.root / "lib" / "main_staging.dart",
             device=None,
@@ -119,6 +121,7 @@ class TaskTemplateTests(unittest.TestCase):
     def test_optional_selectors_only_emit_relevant_flags(self) -> None:
         configuration = FlutterConfiguration(
             project_root=self.root,
+            worktree_root=self.root,
             sdk_mode="flutter",
             target=None,
             device=None,

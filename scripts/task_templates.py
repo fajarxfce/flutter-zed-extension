@@ -22,6 +22,11 @@ from scripts.sdk_resolution import ResolvedSdk
 ZED_WORKTREE_ROOT = "$ZED_WORKTREE_ROOT"
 
 
+def zed_cwd(configuration: FlutterConfiguration) -> str:
+    relative_app = configuration.project_root.resolve().relative_to(configuration.worktree_root.resolve())
+    return ZED_WORKTREE_ROOT if relative_app == Path(".") else f"{ZED_WORKTREE_ROOT}/{relative_app.as_posix()}"
+
+
 @dataclass(frozen=True)
 class TaskTemplate:
     label: str
@@ -30,13 +35,14 @@ class TaskTemplate:
     args: tuple[str, ...]
     cwd: Path
     executable: Path
+    zed_cwd: str = ZED_WORKTREE_ROOT
 
     def as_json(self) -> dict[str, object]:
         return {
             "label": self.label,
             "command": self.command,
             "args": list(self.args),
-            "cwd": ZED_WORKTREE_ROOT,
+            "cwd": self.zed_cwd,
         }
 
 
@@ -92,6 +98,7 @@ def generate_task_templates(configuration: FlutterConfiguration, sdk: ResolvedSd
     run.  The selected target is emitted where Flutter accepts ``--target``.
     """
     root = configuration.project_root.resolve()
+    serialized_cwd = zed_cwd(configuration)
     flutter = sdk.flutter.path.resolve()
     target = _target_args(configuration, root)
     format_target = _relative_to_project(configuration.target, root) if configuration.target is not None else "."
@@ -141,7 +148,10 @@ def generate_task_templates(configuration: FlutterConfiguration, sdk: ResolvedSd
         TaskTemplate("Flutter: Devices", "List available Flutter devices", command, (*flutter_prefix, "devices"), root, flutter),
         TaskTemplate("Flutter: Clean", "Remove Flutter build artifacts", command, (*flutter_prefix, "clean"), root, flutter),
     )
-    return TaskTemplates(templates)
+    return TaskTemplates(tuple(
+        TaskTemplate(task.label, task.intent, task.command, task.args, task.cwd, task.executable, serialized_cwd)
+        for task in templates
+    ))
 
 
 def execute_task_template(
