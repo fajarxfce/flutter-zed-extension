@@ -12,7 +12,8 @@ The validator uses only the Python standard library. Parsing never probes or inv
 
 ```json
 {
-  "project_root": "example-app",
+  "project_root": "app",
+  "worktree_root": ".",
   "sdk_mode": "fvm",
   "target": "lib/main_staging.dart",
   "device": "emulator-5554",
@@ -34,7 +35,8 @@ The validator uses only the Python standard library. Parsing never probes or inv
 
 | Field | Type and validation | Default |
 | --- | --- | --- |
-| `project_root` | Required non-empty relative path to an existing directory. It cannot escape the configuration file's directory. | None |
+| `project_root` | Required non-empty relative path to an existing Flutter application directory. It cannot escape the configuration file's directory. | None |
+| `worktree_root` | Optional non-empty relative path to an existing directory that contains `project_root`. Generated `.zed` files are written here. | `project_root` |
 | `sdk_mode` | `flutter` or `fvm`. FVM is opt-in and is not probed during parsing. | `flutter` |
 | `target` | Optional non-empty relative path rooted at `project_root`; it cannot escape that root. File existence is downstream project-detection work. | None |
 | `device`, `flavor` | Optional non-empty, single-line strings that do not start with `-`. | None |
@@ -42,6 +44,10 @@ The validator uses only the Python standard library. Parsing never probes or inv
 | `args` | Optional list of non-empty, single-line strings. The future command generator must allowlist accepted Flutter flags rather than shell-concatenate this input. | `[]` |
 | `dap` | Optional object requiring Zed-compatible `adapter` and `request` (`launch` or `attach`). Other values are scalar strings, integers, booleans, or safe string lists, for adapter-specific settings. | None |
 | `tmux` | Optional object. If present, it must contain all of `session`, `window`, and `pane` as non-empty, single-line strings. No component is inferred. | None |
+
+## Root-openable monorepos
+
+For a monorepo opened in Zed at its root with a Flutter app in `app/`, put the configuration at the monorepo root with `"project_root": "app"` and `"worktree_root": "."`. Setup validates the Flutter app but writes `.zed/tasks.json` and `.zed/debug.json` at the monorepo root. Generated task and debug `cwd` values are `$ZED_WORKTREE_ROOT/app`; targets and DAP programs remain relative to the Flutter app, such as `lib/main.dart`. Omitting `worktree_root` preserves the legacy app-root setup and emits `$ZED_WORKTREE_ROOT`.
 
 ## tmux inspection boundary
 
