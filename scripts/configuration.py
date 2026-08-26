@@ -15,6 +15,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, TypeAlias, cast
 
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from scripts.project_detection import detect_project
+
 FlutterMode: TypeAlias = Literal["debug", "profile", "release"]
 SdkMode: TypeAlias = Literal["flutter", "fvm"]
 SUPPORTED_FLUTTER_MODES = frozenset({"debug", "profile", "release"})
@@ -44,6 +49,7 @@ class FlutterConfiguration:
     """The stable contract for Flutter project, SDK, task, DAP, and tmux consumers."""
 
     project_root: Path
+    worktree_root: Path
     sdk_mode: SdkMode
     target: Path | None
     device: str | None
@@ -151,7 +157,7 @@ def parse_tmux(value: Any) -> TmuxTarget | None:
 
 def parse_configuration(configuration: dict[str, Any], base_directory: Path) -> FlutterConfiguration:
     """Parse one configuration object without probing external dependencies."""
-    allowed = {"project_root", "sdk_mode", "target", "device", "flavor", "mode", "args", "dap", "tmux"}
+    allowed = {"project_root", "worktree_root", "sdk_mode", "target", "device", "flavor", "mode", "args", "dap", "tmux"}
     unexpected = set(configuration).difference(allowed)
     if unexpected:
         fail("configuration", f"unsupported fields: {', '.join(sorted(unexpected))}")
@@ -159,6 +165,21 @@ def parse_configuration(configuration: dict[str, Any], base_directory: Path) -> 
     project_root = require_path(configuration.get("project_root"), "project_root", base_directory)
     if not project_root.is_dir():
         fail("project_root", f"must name an existing directory: {project_root}")
+    pubspec = project_root / "pubspec.yaml"
+    try:
+        is_flutter_app = pubspec.is_file() and "flutter:" in pubspec.read_text(encoding="utf-8")
+    except OSError:
+        is_flutter_app = False
+    if not is_flutter_app:
+        fail("project_root", "must name a Flutter application")
+    worktree_value = configuration.get("worktree_root", configuration.get("project_root"))
+    worktree_root = require_path(worktree_value, "worktree_root", base_directory)
+    if not worktree_root.is_dir():
+        fail("worktree_root", f"must name an existing directory: {worktree_root}")
+    try:
+        project_root.relative_to(worktree_root)
+    except ValueError:
+        fail("worktree_root", "must contain project_root")
     sdk_mode = require_non_empty_string(configuration.get("sdk_mode", "flutter"), "sdk_mode")
     if sdk_mode not in SUPPORTED_SDK_MODES:
         fail("sdk_mode", "must be 'flutter' or 'fvm'")
@@ -174,6 +195,7 @@ def parse_configuration(configuration: dict[str, Any], base_directory: Path) -> 
 
     return FlutterConfiguration(
         project_root=project_root,
+        worktree_root=worktree_root,
         sdk_mode=cast(SdkMode, sdk_mode),
         target=target,
         device=device,

@@ -32,6 +32,7 @@ class DiagnosticTests(unittest.TestCase):
         self.project_root.mkdir()
         self.configuration = FlutterConfiguration(
             project_root=self.project_root.resolve(),
+            worktree_root=self.project_root.resolve(),
             sdk_mode="flutter",
             target=None,
             device=None,

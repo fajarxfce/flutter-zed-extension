@@ -24,6 +24,7 @@ class SdkResolutionTests(unittest.TestCase):
         self.project_root.mkdir()
         self.configuration = FlutterConfiguration(
             project_root=self.project_root.resolve(),
+            worktree_root=self.project_root.resolve(),
             sdk_mode="fvm",
             target=None,
             device=None,

@@ -88,6 +88,7 @@ class WorkflowFixture:
     def configuration(self, *, tmux: TmuxTarget | None = None) -> FlutterConfiguration:
         return FlutterConfiguration(
             project_root=self.project.resolve(),
+            worktree_root=self.project.resolve(),
             sdk_mode="fvm",
             target=(self.project / "lib" / "main.dart").resolve(),
             device="fake-device",
